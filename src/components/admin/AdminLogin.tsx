@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../../context/DataContext';
-import { Shield, Lock, User, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Shield, Lock, User, ArrowLeft, AlertCircle } from 'lucide-react';
 
 export const AdminLogin: React.FC = () => {
   const { login, navigateTo } = useData();
@@ -12,7 +12,7 @@ export const AdminLogin: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim() || !password.trim()) {
-      setError('Please enter your username and password.');
+      setError('Veuillez renseigner votre email et mot de passe.');
       return;
     }
 
@@ -22,50 +22,50 @@ export const AdminLogin: React.FC = () => {
     try {
       const ok = await login(username.trim(), password.trim());
       if (!ok) {
-        setError('Authentication failed. Please verify your credentials.');
+        setError('Identifiants invalides. Veuillez vérifier vos accès.');
       }
     } catch {
-      setError('An error occurred during authentication. Please try again.');
+      setError('Une erreur est survenue lors de la connexion.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[#030712] text-slate-100 relative overflow-hidden font-sans">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-[#090d16] text-slate-100 relative overflow-hidden font-sans">
       
-      {/* Ambient background glows */}
-      <div className="absolute top-1/4 -left-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-violet-500/10 rounded-full blur-[140px] pointer-events-none" />
+      {/* Ambient Crimson background glows */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-red-600/10 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-rose-600/10 rounded-full blur-[150px] pointer-events-none" />
 
-      <div className="max-w-md w-full space-y-8 p-8 sm:p-10 rounded-3xl obsidian-card border border-white/10 shadow-2xl relative z-10">
+      <div className="max-w-md w-full space-y-8 p-8 sm:p-10 rounded-3xl bg-[#0f172a] border border-slate-800 shadow-2xl relative z-10">
         
         {/* Back to Public Portfolio */}
         <div>
           <button
             onClick={() => navigateTo('portfolio')}
-            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-cyan-300 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Portfolio</span>
+            <span>Retour au Portfolio</span>
           </button>
         </div>
 
         {/* Header */}
         <div className="text-center space-y-2.5">
-          <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(6,182,212,0.25)]">
-            <Shield className="w-6 h-6" />
+          <div className="w-14 h-14 rounded-2xl bg-red-600/15 text-red-500 border border-red-500/30 flex items-center justify-center mx-auto shadow-[0_0_25px_rgba(220,38,38,0.3)]">
+            <Shield className="w-7 h-7" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Administration Console
+            Console d'Administration
           </h1>
           <p className="text-xs text-slate-400">
-            Sign in to manage portfolio content, project case studies, and system settings.
+            Espace d'administration réservé à <strong className="text-slate-200">Moussa Abdou Salam</strong>
           </p>
         </div>
 
         {error && (
-          <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-800/60 text-xs text-red-300 flex items-center gap-2">
+          <div className="p-3.5 rounded-xl bg-red-950/50 border border-red-800/60 text-xs text-red-300 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -84,7 +84,7 @@ export const AdminLogin: React.FC = () => {
                 autoComplete="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 text-sm rounded-xl bg-[#080d1a] border border-white/10 text-white focus:outline-none focus:border-cyan-500 transition-colors shadow-inner"
+                className="w-full pl-10 pr-4 py-3 text-sm rounded-xl bg-[#080d1a] border border-slate-700 text-white focus:outline-none focus:border-red-500 transition-colors shadow-inner"
               />
             </div>
           </div>
@@ -101,7 +101,7 @@ export const AdminLogin: React.FC = () => {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 text-sm rounded-xl bg-[#080d1a] border border-white/10 text-white focus:outline-none focus:border-cyan-500 transition-colors shadow-inner"
+                className="w-full pl-10 pr-4 py-3 text-sm rounded-xl bg-[#080d1a] border border-slate-700 text-white focus:outline-none focus:border-red-500 transition-colors shadow-inner"
               />
             </div>
           </div>
@@ -109,10 +109,10 @@ export const AdminLogin: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm shadow-[0_0_20px_rgba(6,182,212,0.35)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-98"
+            className="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-[0_0_25px_rgba(220,38,38,0.35)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-98"
           >
             <Shield className="w-4 h-4" />
-            <span>{isLoading ? 'Verifying...' : 'Authenticate'}</span>
+            <span>{isLoading ? 'Vérification...' : 'Se Connecter'}</span>
           </button>
         </form>
 
