@@ -1,9 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { useData } from '../../context/DataContext';
 
 export const LiquidParticlesBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { isDarkMode } = useData();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -29,7 +27,7 @@ export const LiquidParticlesBackground: React.FC = () => {
       y: -1000,
       targetX: -1000,
       targetY: -1000,
-      radius: 180,
+      radius: 170,
       speed: 0
     };
 
@@ -76,11 +74,9 @@ export const LiquidParticlesBackground: React.FC = () => {
     }
 
     const particles: FluidParticle[] = [];
-    const count = Math.min(Math.floor((width * height) / 14000), 55);
+    const count = Math.min(Math.floor((width * height) / 15000), 50);
 
-    const darkPalette = ['#06b6d4', '#8b5cf6', '#38bdf8', '#10b981', '#f8fafc'];
-    const lightPalette = ['#0284c7', '#4f46e5', '#7c3aed', '#059669', '#64748b'];
-    const colorPalette = isDarkMode ? darkPalette : lightPalette;
+    const crimsonPalette = ['#dc2626', '#ef4444', '#f87171', '#94a3b8', '#64748b'];
 
     for (let i = 0; i < count; i++) {
       const x = Math.random() * width;
@@ -91,10 +87,10 @@ export const LiquidParticlesBackground: React.FC = () => {
         y,
         originX: x,
         originY: y,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
         size: Math.random() * 2 + 1,
-        color: colorPalette[Math.floor(Math.random() * colorPalette.length)],
+        color: crimsonPalette[Math.floor(Math.random() * crimsonPalette.length)],
         alpha: baseAlpha,
         baseAlpha,
         angle: Math.random() * Math.PI * 2,
@@ -113,14 +109,14 @@ export const LiquidParticlesBackground: React.FC = () => {
       mouse.y += (mouse.targetY - mouse.y) * 0.12;
 
       // Spawn subtle ripples on movement
-      if (mouse.speed > 5 && Math.random() > 0.6) {
+      if (mouse.speed > 6 && Math.random() > 0.65) {
         ripples.push({
           x: mouse.x,
           y: mouse.y,
-          radius: 10,
-          maxRadius: Math.min(120 + mouse.speed * 2, 220),
-          alpha: isDarkMode ? 0.25 : 0.18,
-          color: isDarkMode ? '6, 182, 212' : '2, 132, 199'
+          radius: 8,
+          maxRadius: Math.min(100 + mouse.speed * 2, 200),
+          alpha: 0.2,
+          color: '220, 38, 38'
         });
       }
       mouse.speed *= 0.92;
@@ -128,7 +124,7 @@ export const LiquidParticlesBackground: React.FC = () => {
       // Render Liquid Ripples
       for (let i = ripples.length - 1; i >= 0; i--) {
         const r = ripples[i];
-        r.radius += 2.5;
+        r.radius += 2.2;
         r.alpha *= 0.96;
 
         if (r.alpha < 0.01 || r.radius >= r.maxRadius) {
@@ -148,15 +144,9 @@ export const LiquidParticlesBackground: React.FC = () => {
       // Render Ambient Fluid Mesh behind mouse
       if (mouse.x > 0 && mouse.y > 0) {
         const fluidGrad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 220);
-        if (isDarkMode) {
-          fluidGrad.addColorStop(0, 'rgba(6, 182, 212, 0.08)');
-          fluidGrad.addColorStop(0.5, 'rgba(139, 92, 246, 0.03)');
-          fluidGrad.addColorStop(1, 'rgba(3, 7, 18, 0)');
-        } else {
-          fluidGrad.addColorStop(0, 'rgba(2, 132, 199, 0.06)');
-          fluidGrad.addColorStop(0.5, 'rgba(99, 102, 241, 0.02)');
-          fluidGrad.addColorStop(1, 'rgba(248, 250, 252, 0)');
-        }
+        fluidGrad.addColorStop(0, 'rgba(220, 38, 38, 0.05)');
+        fluidGrad.addColorStop(0.5, 'rgba(239, 68, 68, 0.02)');
+        fluidGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.fillStyle = fluidGrad;
         ctx.fillRect(0, 0, width, height);
       }
@@ -167,8 +157,8 @@ export const LiquidParticlesBackground: React.FC = () => {
 
         // Fluid drifting
         p.angle += p.speed;
-        p.x += p.vx + Math.sin(p.angle + time) * 0.4;
-        p.y += p.vy + Math.cos(p.angle + time) * 0.4;
+        p.x += p.vx + Math.sin(p.angle + time) * 0.35;
+        p.y += p.vy + Math.cos(p.angle + time) * 0.35;
 
         if (p.x < 0) p.x = width;
         else if (p.x > width) p.x = 0;
@@ -184,7 +174,7 @@ export const LiquidParticlesBackground: React.FC = () => {
           const force = (1 - dist / mouse.radius);
           p.x -= (dx / dist) * force * 3;
           p.y -= (dy / dist) * force * 3;
-          p.alpha = Math.min(p.baseAlpha * 2.5, 0.9);
+          p.alpha = Math.min(p.baseAlpha * 2.5, 0.85);
         } else {
           p.alpha = p.baseAlpha;
         }
@@ -203,11 +193,11 @@ export const LiquidParticlesBackground: React.FC = () => {
           const p2 = particles[j];
           const distNodes = Math.hypot(p.x - p2.x, p.y - p2.y);
 
-          if (distNodes < 120) {
+          if (distNodes < 110) {
             ctx.save();
-            const linkAlpha = (1 - distNodes / 120) * (isDarkMode ? 0.15 : 0.1);
+            const linkAlpha = (1 - distNodes / 110) * 0.08;
             ctx.globalAlpha = linkAlpha;
-            ctx.strokeStyle = isDarkMode ? '#38bdf8' : '#6366f1';
+            ctx.strokeStyle = '#ef4444';
             ctx.lineWidth = 0.8;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
@@ -228,13 +218,13 @@ export const LiquidParticlesBackground: React.FC = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isDarkMode]);
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: isDarkMode ? 0.85 : 0.7 }}
+      style={{ opacity: 0.7 }}
     />
   );
 };

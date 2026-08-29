@@ -1,13 +1,11 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 @layer base {
   :root {
-    --color-cyan-glow: #06b6d4;
-    --color-violet-glow: #8b5cf6;
-    --color-emerald-glow: #10b981;
-    --color-amber-glow: #f59e0b;
+    --color-crimson: #dc2626;
+    --color-crimson-light: #ef4444;
+    --color-crimson-dark: #991b1b;
+    --color-crimson-glow: rgba(220, 38, 38, 0.2);
     --font-heading: 'Plus Jakarta Sans', 'Outfit', sans-serif;
     --font-display: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, sans-serif;
@@ -17,26 +15,20 @@
   html {
     scroll-behavior: smooth;
     font-family: var(--font-body);
-  }
-
-  html.dark {
-    background-color: #030712;
-    color: #f8fafc;
-  }
-
-  html:not(.dark) {
-    background-color: #f8fafc;
+    background-color: #ffffff;
     color: #090d16;
   }
 
   body {
     overflow-x: hidden;
     min-height: 100vh;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: #ffffff;
+    color: #090d16;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
+    color: #090d16;
   }
 
   .font-display {
@@ -55,155 +47,62 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #f8fafc;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.35);
+  background: #cbd5e1;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0284c7;
+  background: #dc2626;
 }
 
-/* Aurora Glow & Floating Keyframes */
-@keyframes auroraMove {
-  0% { transform: translate(0, 0) scale(1); opacity: 0.35; }
-  33% { transform: translate(30px, -40px) scale(1.15); opacity: 0.55; }
-  66% { transform: translate(-20px, 30px) scale(0.9); opacity: 0.45; }
-  100% { transform: translate(0, 0) scale(1); opacity: 0.35; }
+/* Crimson Studio Card Surfaces */
+.crimson-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes pulseBorder {
-  0%, 100% { border-color: rgba(6, 182, 212, 0.3); box-shadow: 0 0 15px rgba(6, 182, 212, 0.1); }
-  50% { border-color: rgba(139, 92, 246, 0.5); box-shadow: 0 0 25px rgba(139, 92, 246, 0.2); }
+.crimson-card:hover {
+  border-color: rgba(220, 38, 38, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 35px -10px rgba(220, 38, 38, 0.12), 0 0 0 1px rgba(220, 38, 38, 0.15);
 }
 
-@keyframes typewriterBlink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+/* Crimson Gradients */
+.text-gradient-crimson {
+  background: linear-gradient(135deg, #090d16 20%, #dc2626 70%, #ef4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-ruby {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 60%, #991b1b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Subtle Technical Grid Background */
+.bg-tech-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+}
+
+.bg-radial-crimson {
+  background: radial-gradient(circle at 50% 0%, rgba(220, 38, 38, 0.06), transparent 60%);
 }
 
 @keyframes floatGentle {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-}
-
-.animate-aurora {
-  animation: auroraMove 18s ease-in-out infinite alternate;
-}
-
-.animate-pulse-border {
-  animation: pulseBorder 4s ease-in-out infinite;
-}
-
-.animate-blink {
-  animation: typewriterBlink 1s infinite;
+  50% { transform: translateY(-6px); }
 }
 
 .animate-float-gentle {
   animation: floatGentle 5s ease-in-out infinite;
-}
-
-/* Glassmorphism & High-End Card Surfaces */
-.obsidian-card {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(3, 7, 18, 0.92) 100%);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
-}
-
-/* Light Theme Card Polish - Pure Crystal & High Clarity */
-html:not(.dark) .obsidian-card {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(203, 213, 225, 0.7);
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 2px 6px -2px rgba(15, 23, 42, 0.03);
-}
-
-html:not(.dark) .obsidian-card h3,
-html:not(.dark) .obsidian-card h4,
-html:not(.dark) .obsidian-card h5 {
-  color: #0f172a !important;
-}
-
-html:not(.dark) .obsidian-card p {
-  color: #334155 !important;
-}
-
-.obsidian-card-hover {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.obsidian-card-hover:hover {
-  transform: translateY(-4px);
-  border-color: rgba(6, 182, 212, 0.5);
-  box-shadow: 0 20px 40px -15px rgba(6, 182, 212, 0.2), 0 0 0 1px rgba(6, 182, 212, 0.2);
-}
-
-html:not(.dark) .obsidian-card-hover:hover {
-  border-color: rgba(2, 132, 199, 0.45);
-  box-shadow: 0 20px 35px -10px rgba(2, 132, 199, 0.12), 0 0 0 1px rgba(2, 132, 199, 0.15);
-}
-
-/* Gradient Texts */
-.text-gradient-cyan {
-  background: linear-gradient(135deg, #ffffff 0%, #38bdf8 60%, #06b6d4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-html:not(.dark) .text-gradient-cyan {
-  background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #4f46e5 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-aurora {
-  background: linear-gradient(135deg, #38bdf8 0%, #a855f7 50%, #ec4899 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-html:not(.dark) .text-gradient-aurora {
-  background: linear-gradient(135deg, #0284c7 0%, #4f46e5 50%, #9333ea 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-emerald {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 60%, #059669 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-html:not(.dark) .text-gradient-emerald {
-  background: linear-gradient(135deg, #059669 0%, #047857 60%, #065f46 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Subtle Grid Texture Background */
-.bg-cyber-grid {
-  background-size: 40px 40px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-}
-
-html:not(.dark) .bg-cyber-grid {
-  background-image: 
-    linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
-}
-
-.bg-radial-gradient {
-  background: radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.15), transparent 70%);
-}
-
-html:not(.dark) .bg-radial-gradient {
-  background: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.08), transparent 70%);
 }

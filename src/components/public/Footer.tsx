@@ -1,6 +1,6 @@
 import React from 'react';
 import { useData } from '../../context/DataContext';
-import { ArrowUp, Github, Linkedin, Mail } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const { data, activeLanguage } = useData();
@@ -11,7 +11,7 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="py-12 max-w-5xl mx-auto px-6 sm:px-8 border-t border-slate-200/70 dark:border-slate-800/70 text-xs font-mono text-slate-500 dark:text-slate-400">
+    <footer className="py-12 max-w-5xl mx-auto px-6 sm:px-8 border-t border-slate-200 text-xs font-mono text-slate-500">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
         
         <div>
@@ -23,7 +23,7 @@ export const Footer: React.FC = () => {
             href="https://linkedin.com/in/abdou-salam-moussa"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="hover:text-red-600 transition-colors"
           >
             LinkedIn
           </a>
@@ -31,19 +31,19 @@ export const Footer: React.FC = () => {
             href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="hover:text-red-600 transition-colors"
           >
             GitHub
           </a>
           <a
             href={`mailto:${info.email || 'moussasalam86@gmail.com'}`}
-            className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="hover:text-red-600 transition-colors"
           >
             Email
           </a>
           <button
             onClick={scrollToTop}
-            className="hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+            className="hover:text-red-600 transition-colors cursor-pointer flex items-center gap-1"
           >
             <span>Haut</span>
             <ArrowUp className="w-3.5 h-3.5" />

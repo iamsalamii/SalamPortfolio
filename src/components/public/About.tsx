@@ -15,14 +15,14 @@ export const About: React.FC = () => {
   const principles = (info.principles && info.principles.length > 0) ? info.principles : defaultPrinciples;
 
   return (
-    <section id="about" className="py-20 sm:py-28 max-w-5xl mx-auto px-6 sm:px-8 border-t border-slate-200/70 dark:border-slate-800/70">
+    <section id="about" className="py-20 sm:py-28 max-w-5xl mx-auto px-6 sm:px-8 border-t border-slate-200">
       
       {/* Section Header */}
       <div className="mb-12">
-        <p className="text-xs font-mono uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
+        <p className="text-xs font-mono uppercase tracking-widest text-red-600 mb-2 font-bold">
           01 / {activeLanguage === 'fr' ? 'À propos' : 'About'}
         </p>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
           {activeLanguage === 'fr' ? 'Profil & Démarche' : 'Profile & Philosophy'}
         </h2>
       </div>
@@ -31,7 +31,7 @@ export const About: React.FC = () => {
         
         {/* Photo Column */}
         <div className="md:col-span-5">
-          <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-800 group shadow-sm">
+          <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 group shadow-sm">
             <img
               src={info.avatarUrl || '/assets/maphotops600.jpg'}
               alt={`${info.firstName} ${info.lastName}`}
@@ -46,7 +46,7 @@ export const About: React.FC = () => {
 
         {/* Biography & Principles Column */}
         <div className="md:col-span-7 space-y-6">
-          <p className="text-base sm:text-lg text-slate-800 dark:text-slate-200 leading-relaxed font-normal">
+          <p className="text-base sm:text-lg text-slate-800 leading-relaxed font-normal">
             {info.bioShort || (activeLanguage === 'fr' 
               ? "Développeur Full Stack .NET passionné par la conception de systèmes fiables, modulaires et performants. J'interviens sur l'ensemble de la chaîne technique, de la modélisation de base de données jusqu'à l'expérience utilisateur finale."
               : "Full Stack .NET Developer dedicated to engineering reliable, modular, and high-performance software systems.")}
@@ -54,12 +54,12 @@ export const About: React.FC = () => {
 
           {info.bioLong && info.bioLong.length > 0 ? (
             info.bioLong.map((para, i) => (
-              <p key={i} className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p key={i} className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 {para}
               </p>
             ))
           ) : (
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
               {activeLanguage === 'fr'
                 ? "Au sein du GROUPE DIRECTSOFT, je participe au développement de modules ERP critiques, à l'optimisation des requêtes LINQ / SQL et à l'implémentation de principes d'architecture logicielle (SOLID, Injection de dépendances, Tests unitaires)."
                 : "At GROUPE DIRECTSOFT, I contribute to enterprise ERP modules, LINQ / SQL query optimizations, and strict software design patterns (SOLID, Dependency Injection, Unit Testing)."}
@@ -67,11 +67,11 @@ export const About: React.FC = () => {
           )}
 
           {/* Key Dynamic Principles Checklist */}
-          <div className="pt-4 border-t border-slate-200/60 dark:border-slate-800/60 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono text-slate-600 dark:text-slate-400">
+          <div className="pt-4 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono text-slate-600">
             {principles.map((item, idx) => (
-              <div key={idx} className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 hover:border-slate-400 dark:hover:border-slate-600 transition-colors">
-                <span className="font-bold text-slate-900 dark:text-white block mb-1">{item.title}</span>
-                <span className="text-slate-500 dark:text-slate-400">{item.description}</span>
+              <div key={idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-red-500/50 hover:bg-red-50/20 transition-all">
+                <span className="font-bold text-slate-950 block mb-1">{item.title}</span>
+                <span className="text-slate-500">{item.description}</span>
               </div>
             ))}
           </div>

@@ -170,7 +170,7 @@ const MainAppContent: React.FC = () => {
   return (
     <>
       {!hasLoaded && <PagePreloader onComplete={() => setHasLoaded(true)} />}
-      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#030712] text-slate-900 dark:text-slate-100 transition-colors relative overflow-x-hidden">
+      <div className="min-h-screen flex flex-col bg-white text-slate-950 relative overflow-x-hidden">
         <LiquidParticlesBackground />
         <Navbar />
         <main className="flex-1 relative z-10">

@@ -27,15 +27,15 @@ export const TechStack: React.FC = () => {
     : technologies.filter((tech) => tech.categoryId === selectedCategory);
 
   return (
-    <section id="skills" className="py-20 sm:py-28 max-w-5xl mx-auto px-6 sm:px-8 border-t border-slate-200/70 dark:border-slate-800/70">
+    <section id="skills" className="py-20 sm:py-28 max-w-5xl mx-auto px-6 sm:px-8 border-t border-slate-200">
       
       {/* Editorial Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
         <div className="space-y-2">
-          <p className="text-xs font-mono uppercase tracking-widest text-slate-400 dark:text-slate-500">
+          <p className="text-xs font-mono uppercase tracking-widest text-red-600 font-bold">
             03 / {activeLanguage === 'fr' ? 'Compétences' : 'Stack'}
           </p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
             {activeLanguage === 'fr' ? 'Technologies & Outils' : 'Technologies & Tools'}
           </h2>
         </div>
@@ -48,8 +48,8 @@ export const TechStack: React.FC = () => {
               onClick={() => setSelectedCategory(cat.id)}
               className={`px-3.5 py-1 rounded-full text-xs transition-all cursor-pointer ${
                 selectedCategory === cat.id
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 font-medium'
-                  : 'bg-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-red-600 text-white font-semibold shadow-xs'
+                  : 'bg-transparent text-slate-600 hover:text-red-600'
               }`}
             >
               {cat.label}
@@ -63,16 +63,16 @@ export const TechStack: React.FC = () => {
         {filteredTechs.map((tech) => (
           <div
             key={tech.id}
-            className="p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 hover:border-slate-400 dark:hover:border-slate-700 transition-all duration-200 flex items-center gap-3.5 group"
+            className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-red-500/50 hover:shadow-md transition-all duration-200 flex items-center gap-3.5 group cursor-default"
           >
-            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-center p-2 shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center p-2 shrink-0 shadow-xs group-hover:scale-105 transition-transform">
               <TechLogo name={tech.name} size={22} className="w-5 h-5 object-contain" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+              <h3 className="text-sm font-bold text-slate-950 truncate group-hover:text-red-600 transition-colors">
                 {tech.name}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+              <p className="text-[11px] text-slate-500 truncate font-mono">
                 {tech.categoryName || 'Framework'}
               </p>
             </div>

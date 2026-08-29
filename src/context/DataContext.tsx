@@ -150,47 +150,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // Theme calculation & application
+  // Unified Crimson Precision Theme
   useEffect(() => {
     const root = document.documentElement;
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-    const updateDarkClass = () => {
-      let dark = false;
-      if (themeMode === 'dark') {
-        dark = true;
-      } else if (themeMode === 'light') {
-        dark = false;
-      } else {
-        dark = mediaQuery.matches;
-      }
-
-      setIsDarkMode(dark);
-      if (dark) {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
-    };
-
-    updateDarkClass();
-    mediaQuery.addEventListener('change', updateDarkClass);
-
-    // Apply custom CSS colors if set in themeSettings
-    if (data.themeSettings) {
-      if (data.themeSettings.primaryColor) {
-        root.style.setProperty('--color-primary', data.themeSettings.primaryColor);
-      }
-      if (data.themeSettings.secondaryColor) {
-        root.style.setProperty('--color-secondary', data.themeSettings.secondaryColor);
-      }
-      if (data.themeSettings.accentColor) {
-        root.style.setProperty('--color-accent', data.themeSettings.accentColor);
-      }
-    }
-
-    return () => mediaQuery.removeEventListener('change', updateDarkClass);
-  }, [themeMode, data.themeSettings]);
+    root.classList.remove('dark');
+    setIsDarkMode(false);
+  }, []);
 
   const setActiveLanguage = useCallback((code: string) => {
     setActiveLanguageState(code);
