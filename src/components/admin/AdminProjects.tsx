@@ -9,12 +9,8 @@ import {
   Trash2, 
   ExternalLink, 
   Github, 
-  Star, 
   Eye, 
   X, 
-  CheckCircle2, 
-  Sparkles, 
-  Layers, 
   Save 
 } from 'lucide-react';
 
@@ -32,7 +28,6 @@ export const AdminProjects: React.FC = () => {
   const [challengeInput, setChallengeInput] = useState('');
   const [solutionInput, setSolutionInput] = useState('');
   const [resultInput, setResultInput] = useState('');
-  const [galleryInput, setGalleryInput] = useState('');
 
   const projects = data.projects || [];
   const categories = data.projectCategories || [];
@@ -49,7 +44,7 @@ export const AdminProjects: React.FC = () => {
   const openCreateModal = () => {
     setEditingProject({
       id: `proj_${Date.now()}`,
-      slug: `new-csharp-project-${Date.now().toString().slice(-4)}`,
+      slug: `projet-net-${Date.now().toString().slice(-4)}`,
       title: '',
       shortDescription: '',
       fullDescription: '',
@@ -59,14 +54,14 @@ export const AdminProjects: React.FC = () => {
       categoryId: categories[0]?.id || 'cat_backend',
       client: '',
       role: 'Lead Architect',
-      duration: '6 Months',
+      duration: '6 Mois',
       status: 'published',
       isFeatured: false,
       features: [],
       challenges: [],
       solutions: [],
       results: [],
-      architectureNotes: 'Clean Architecture with CQRS (MediatR), Domain-Driven Design, EF Core 9.',
+      architectureNotes: 'Architecture Clean avec CQRS (MediatR), Domain-Driven Design, EF Core.',
       githubUrl: '',
       liveDemoUrl: '',
       order: projects.length + 1,
@@ -82,22 +77,12 @@ export const AdminProjects: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this project?')) {
-      const next = projects.filter(p => p.id !== id);
-      await updateData({ projects: next });
-    }
-  };
-
   const handleSaveProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingProject?.title || !editingProject?.slug) {
-      alert('Please fill out the Project Title and Slug.');
-      return;
-    }
+    if (!editingProject || !editingProject.title) return;
 
-    let nextProjects: Project[] = [];
     const exists = projects.some(p => p.id === editingProject.id);
+    let nextProjects: Project[];
 
     if (exists) {
       nextProjects = projects.map(p => p.id === editingProject.id ? (editingProject as Project) : p);
@@ -110,13 +95,10 @@ export const AdminProjects: React.FC = () => {
     setEditingProject(null);
   };
 
-  const autoGenerateSlug = () => {
-    if (editingProject?.title) {
-      const generated = editingProject.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
-      setEditingProject({ ...editingProject, slug: generated });
+  const handleDelete = async (id: string) => {
+    if (confirm('Voulez-vous vraiment supprimer ce projet ?')) {
+      const next = projects.filter(p => p.id !== id);
+      await updateData({ projects: next });
     }
   };
 
@@ -130,23 +112,23 @@ export const AdminProjects: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12 max-w-6xl">
       
       {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <FolderGit2 className="w-5 h-5 text-red-500" />
-            <span>Projets &amp; Études de Cas</span>
+          <h2 className="text-xl font-extrabold text-slate-950 flex items-center gap-2">
+            <FolderGit2 className="w-5 h-5 text-red-600" />
+            <span>Projets &amp; Réalisations</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Gérez vos projets publics, descriptions techniques, captures d'écran et associations technologiques.
           </p>
         </div>
 
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-[0_4px_15px_rgba(220,38,38,0.25)] transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Ajouter un Projet</span>
@@ -154,15 +136,15 @@ export const AdminProjects: React.FC = () => {
       </div>
 
       {/* Filter Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-slate-900 border border-slate-800">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
         <div className="relative">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search projects..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Rechercher un projet..."
+            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-600 focus:bg-white"
           />
         </div>
 
@@ -170,9 +152,9 @@ export const AdminProjects: React.FC = () => {
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white"
           >
-            <option value="all">All Categories</option>
+            <option value="all">Toutes les Catégories</option>
             {categories.map(c => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
@@ -183,93 +165,91 @@ export const AdminProjects: React.FC = () => {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white"
           >
-            <option value="all">All Statuses</option>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
-            <option value="archived">Archived</option>
+            <option value="all">Tous les Statuts</option>
+            <option value="published">Publié</option>
+            <option value="draft">Brouillon</option>
+            <option value="archived">Archivé</option>
           </select>
         </div>
       </div>
 
       {/* Projects Table */}
-      <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-sm">
+      <div className="rounded-3xl bg-white border border-slate-200 overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-850 text-slate-400 font-semibold uppercase tracking-wider text-[10px] border-b border-slate-800">
+          <table className="w-full text-left text-xs text-slate-700">
+            <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200 font-mono">
               <tr>
-                <th className="py-3.5 px-4">Project</th>
-                <th className="py-3.5 px-4">Category</th>
-                <th className="py-3.5 px-4">Role & Client</th>
-                <th className="py-3.5 px-4">Status</th>
+                <th className="py-3.5 px-4">Projet</th>
+                <th className="py-3.5 px-4">Catégorie</th>
+                <th className="py-3.5 px-4">Rôle &amp; Client</th>
+                <th className="py-3.5 px-4">Statut</th>
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-slate-100">
               {filteredProjects.map((p) => {
-                const catName = categories.find(c => c.id === p.categoryId)?.name || p.categoryName || 'General';
+                const catName = categories.find(c => c.id === p.categoryId)?.name || p.categoryName || 'Général';
                 return (
-                  <tr key={p.id} className="hover:bg-slate-800/50 transition-colors">
-                    <td className="py-3 px-4">
+                  <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
                         <img
                           src={p.mainImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=100&q=80'}
                           alt={p.title}
-                          className="w-12 h-8 rounded object-cover shrink-0 bg-slate-800"
-                          referrerPolicy="no-referrer"
+                          className="w-12 h-8 rounded-lg object-cover shrink-0 bg-slate-100 border border-slate-200"
                         />
                         <div>
-                          <div className="font-bold text-white flex items-center gap-1.5">
-                            <span>{p.title}</span>
-                            {p.isFeatured && (
-                              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                            )}
+                          <div className="font-bold text-slate-950 text-sm hover:text-red-600 transition-colors cursor-pointer" onClick={() => openEditModal(p)}>
+                            {p.title}
                           </div>
-                          <span className="text-[11px] text-slate-500 font-mono">/{p.slug}</span>
+                          <div className="text-slate-400 text-[11px] font-mono">{p.slug}</div>
                         </div>
                       </div>
                     </td>
 
-                    <td className="py-3 px-4 font-medium text-slate-300">
-                      {catName}
+                    <td className="py-3.5 px-4">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                        {catName}
+                      </span>
                     </td>
 
-                    <td className="py-3 px-4">
-                      <div className="text-white font-medium">{p.role}</div>
-                      <div className="text-slate-500 text-[11px]">{p.client || 'Internal Project'}</div>
+                    <td className="py-3.5 px-4">
+                      <div className="font-semibold text-slate-900">{p.role || 'Développeur'}</div>
+                      <div className="text-slate-500 text-[11px]">{p.client || 'Projet Interne'}</div>
                     </td>
 
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                        p.status === 'published' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' :
-                        p.status === 'draft' ? 'bg-amber-950 text-amber-300 border border-amber-800' :
-                        'bg-slate-800 text-slate-400'
+                    <td className="py-3.5 px-4">
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                        p.status === 'published' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                        p.status === 'draft' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                        'bg-slate-100 text-slate-600'
                       }`}>
                         {p.status}
                       </span>
                     </td>
 
-                    <td className="py-3 px-4 text-right">
+                    <td className="py-3.5 px-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => navigateTo('project-detail', p.slug)}
-                          className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded"
-                          title="View Case Study"
+                          className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                          title="Voir le projet public"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => openEditModal(p)}
-                          className="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded"
-                          title="Edit"
+                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                          title="Modifier"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(p.id)}
-                          className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded"
-                          title="Delete"
+                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                          title="Supprimer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -281,8 +261,8 @@ export const AdminProjects: React.FC = () => {
 
               {filteredProjects.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-slate-500">
-                    No projects found matching current criteria.
+                  <td colSpan={5} className="py-12 text-center text-slate-400">
+                    Aucun projet correspondant aux critères de recherche.
                   </td>
                 </tr>
               )}
@@ -293,58 +273,62 @@ export const AdminProjects: React.FC = () => {
 
       {/* Edit / Create Modal */}
       {isModalOpen && editingProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
-          <div className="relative w-full max-w-4xl max-h-[90vh] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-4xl max-h-[90vh] bg-white border border-slate-200 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
             
             {/* Modal Header */}
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-white">
-                  {editingProject.title ? `Edit: ${editingProject.title}` : 'Create New Project Case Study'}
+                <h3 className="text-base font-extrabold text-slate-950">
+                  {editingProject.title ? `Modifier : ${editingProject.title}` : 'Créer un Nouveau Projet'}
                 </h3>
-                <span className="text-xs text-slate-400">Configure comprehensive architecture data and measurable impact</span>
+                <span className="text-xs text-slate-500">Configurez les détails techniques et métriques d'ingénierie</span>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg"
+                className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-full cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-slate-800 bg-slate-850 px-4 text-xs font-semibold">
+            <div className="flex border-b border-slate-200 bg-slate-50 px-4 text-xs font-bold">
               <button
+                type="button"
                 onClick={() => setActiveTab('details')}
-                className={`py-3 px-4 border-b-2 transition-colors ${
-                  activeTab === 'details' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-white'
+                className={`py-3 px-4 border-b-2 transition-colors cursor-pointer ${
+                  activeTab === 'details' ? 'border-red-600 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-900'
                 }`}
               >
-                1. General Meta
+                1. Métadonnées
               </button>
               <button
+                type="button"
                 onClick={() => setActiveTab('content')}
-                className={`py-3 px-4 border-b-2 transition-colors ${
-                  activeTab === 'content' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-white'
+                className={`py-3 px-4 border-b-2 transition-colors cursor-pointer ${
+                  activeTab === 'content' ? 'border-red-600 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-900'
                 }`}
               >
-                2. Descriptions & Architecture
+                2. Descriptions &amp; Architecture
               </button>
               <button
+                type="button"
                 onClick={() => setActiveTab('tech')}
-                className={`py-3 px-4 border-b-2 transition-colors ${
-                  activeTab === 'tech' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-white'
+                className={`py-3 px-4 border-b-2 transition-colors cursor-pointer ${
+                  activeTab === 'tech' ? 'border-red-600 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-900'
                 }`}
               >
                 3. Technologies ({editingProject.technologyIds?.length || 0})
               </button>
               <button
+                type="button"
                 onClick={() => setActiveTab('lists')}
-                className={`py-3 px-4 border-b-2 transition-colors ${
-                  activeTab === 'lists' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-white'
+                className={`py-3 px-4 border-b-2 transition-colors cursor-pointer ${
+                  activeTab === 'lists' ? 'border-red-600 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-900'
                 }`}
               >
-                4. Features, Challenges & Results
+                4. Fonctionnalités &amp; Solutions
               </button>
             </div>
 
@@ -356,44 +340,33 @@ export const AdminProjects: React.FC = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">Title *</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Titre du Projet *</label>
                       <input
                         type="text"
                         required
                         value={editingProject.title || ''}
                         onChange={(e) => setEditingProject({ ...editingProject, title: e.target.value })}
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white"
+                        className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                       />
                     </div>
-
                     <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-xs font-semibold text-slate-300">URL Slug *</label>
-                        <button
-                          type="button"
-                          onClick={autoGenerateSlug}
-                          className="text-[10px] text-indigo-400 hover:underline"
-                        >
-                          Auto Generate
-                        </button>
-                      </div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Slug URL</label>
                       <input
                         type="text"
-                        required
                         value={editingProject.slug || ''}
                         onChange={(e) => setEditingProject({ ...editingProject, slug: e.target.value })}
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white font-mono"
+                        className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">Category</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Catégorie</label>
                       <select
-                        value={editingProject.categoryId}
+                        value={editingProject.categoryId || ''}
                         onChange={(e) => setEditingProject({ ...editingProject, categoryId: e.target.value })}
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white"
+                        className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                       >
                         {categories.map(c => (
                           <option key={c.id} value={c.id}>{c.name}</option>
@@ -402,108 +375,59 @@ export const AdminProjects: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">Status</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Statut</label>
                       <select
-                        value={editingProject.status}
+                        value={editingProject.status || 'published'}
                         onChange={(e) => setEditingProject({ ...editingProject, status: e.target.value as any })}
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white"
+                        className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                       >
-                        <option value="published">Published</option>
-                        <option value="draft">Draft</option>
-                        <option value="archived">Archived</option>
+                        <option value="published">Publié</option>
+                        <option value="draft">Brouillon</option>
+                        <option value="archived">Archivé</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">Order</label>
-                      <input
-                        type="number"
-                        value={editingProject.order || 1}
-                        onChange={(e) => setEditingProject({ ...editingProject, order: parseInt(e.target.value) || 1 })}
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">Role</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Rôle</label>
                       <input
                         type="text"
                         value={editingProject.role || ''}
                         onChange={(e) => setEditingProject({ ...editingProject, role: e.target.value })}
-                        placeholder="e.g. Lead .NET Architect"
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">Client / Company</label>
-                      <input
-                        type="text"
-                        value={editingProject.client || ''}
-                        onChange={(e) => setEditingProject({ ...editingProject, client: e.target.value })}
-                        placeholder="e.g. FinTech Enterprise"
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">Timeline / Duration</label>
-                      <input
-                        type="text"
-                        value={editingProject.duration || ''}
-                        onChange={(e) => setEditingProject({ ...editingProject, duration: e.target.value })}
-                        placeholder="e.g. 9 Months"
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white"
+                        className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">GitHub Repo URL</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">URL GitHub</label>
                       <input
                         type="text"
                         value={editingProject.githubUrl || ''}
                         onChange={(e) => setEditingProject({ ...editingProject, githubUrl: e.target.value })}
-                        placeholder="https://github.com/..."
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white"
+                        className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">Live Demo / Production URL</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">URL Démo / Site</label>
                       <input
                         type="text"
                         value={editingProject.liveDemoUrl || ''}
                         onChange={(e) => setEditingProject({ ...editingProject, liveDemoUrl: e.target.value })}
-                        placeholder="https://..."
-                        className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white"
+                        className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Main Cover Image URL</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Image Principale (URL)</label>
                     <input
                       type="text"
                       value={editingProject.mainImage || ''}
                       onChange={(e) => setEditingProject({ ...editingProject, mainImage: e.target.value })}
-                      className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white"
+                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                     />
-                  </div>
-
-                  <div className="pt-2">
-                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-200 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={editingProject.isFeatured || false}
-                        onChange={(e) => setEditingProject({ ...editingProject, isFeatured: e.target.checked })}
-                        className="rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-0"
-                      />
-                      <span>Mark as Featured Case Study (Highlighted with badge)</span>
-                    </label>
                   </div>
                 </div>
               )}
@@ -512,65 +436,57 @@ export const AdminProjects: React.FC = () => {
               {activeTab === 'content' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Short Description (Cards)</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Courte Description</label>
                     <textarea
-                      rows={2}
+                      rows={3}
                       value={editingProject.shortDescription || ''}
                       onChange={(e) => setEditingProject({ ...editingProject, shortDescription: e.target.value })}
-                      className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white"
+                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      Full Case Study (Markdown Supported)
-                    </label>
-                    <textarea
-                      rows={8}
-                      value={editingProject.fullDescription || ''}
-                      onChange={(e) => setEditingProject({ ...editingProject, fullDescription: e.target.value })}
-                      className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white font-mono"
-                      placeholder="Write detailed architecture, problem statement, benchmarking..."
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      Architecture & System Design Notes
-                    </label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Notes d'Architecture</label>
                     <textarea
                       rows={3}
                       value={editingProject.architectureNotes || ''}
                       onChange={(e) => setEditingProject({ ...editingProject, architectureNotes: e.target.value })}
-                      className="w-full px-3 py-2 text-xs rounded-lg bg-slate-800 border border-slate-700 text-white font-mono"
+                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Étude de Cas Détaillée (Markdown)</label>
+                    <textarea
+                      rows={6}
+                      value={editingProject.fullDescription || ''}
+                      onChange={(e) => setEditingProject({ ...editingProject, fullDescription: e.target.value })}
+                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                     />
                   </div>
                 </div>
               )}
 
-              {/* Tab 3: Technologies */}
+              {/* Tab 3: Tech Associations */}
               {activeTab === 'tech' && (
-                <div className="space-y-4">
-                  <span className="text-xs text-slate-400 block">
-                    Click to select/deselect the technologies utilized in this project:
-                  </span>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                    {technologies.map((t) => {
+                <div className="space-y-3">
+                  <p className="text-xs text-slate-500">Cochez les technologies associées à ce projet :</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 max-h-72 overflow-y-auto pr-1">
+                    {technologies.map(t => {
                       const isSelected = editingProject.technologyIds?.includes(t.id);
                       return (
                         <button
-                          key={t.id}
                           type="button"
+                          key={t.id}
                           onClick={() => toggleTechId(t.id)}
-                          className={`p-2.5 rounded-lg text-left text-xs font-semibold border transition-all flex items-center justify-between ${
+                          className={`p-3 rounded-xl border text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
                             isSelected
-                              ? 'bg-indigo-600/30 border-indigo-500 text-white'
-                              : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
+                              ? 'bg-red-50 border-red-500 text-red-700 shadow-xs'
+                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white'
                           }`}
                         >
                           <span>{t.name}</span>
-                          {isSelected && <CheckCircle2 className="w-4 h-4 text-indigo-400" />}
+                          <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-red-600' : 'bg-slate-300'}`} />
                         </button>
                       );
                     })}
@@ -578,33 +494,19 @@ export const AdminProjects: React.FC = () => {
                 </div>
               )}
 
-              {/* Tab 4: Lists (Features, Challenges, Solutions, Results) */}
+              {/* Tab 4: Lists */}
               {activeTab === 'lists' && (
                 <div className="space-y-6">
                   {/* Features */}
                   <div className="space-y-2">
-                    <label className="block text-xs font-bold text-white uppercase tracking-wider text-[11px] text-indigo-400">
-                      Key Engineering Features
-                    </label>
+                    <label className="block text-xs font-bold text-slate-900 uppercase font-mono">Fonctionnalités Clés</label>
                     <div className="flex gap-2">
                       <input
                         type="text"
                         value={featureInput}
                         onChange={(e) => setFeatureInput(e.target.value)}
-                        placeholder="e.g. Sub-millisecond latency trading engine"
-                        className="flex-1 px-3 py-1.5 text-xs rounded bg-slate-800 border border-slate-700 text-white"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            if (featureInput.trim()) {
-                              setEditingProject({
-                                ...editingProject,
-                                features: [...(editingProject.features || []), featureInput.trim()]
-                              });
-                              setFeatureInput('');
-                            }
-                          }
-                        }}
+                        placeholder="Ajouter une fonctionnalité..."
+                        className="flex-1 px-3 py-1.5 text-xs rounded-xl bg-slate-50 border border-slate-300"
                       />
                       <button
                         type="button"
@@ -617,14 +519,15 @@ export const AdminProjects: React.FC = () => {
                             setFeatureInput('');
                           }
                         }}
-                        className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded"
+                        className="px-4 py-1.5 bg-red-600 text-white rounded-xl text-xs font-bold"
                       >
-                        Add
+                        Ajouter
                       </button>
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
+
+                    <div className="flex flex-wrap gap-2">
                       {editingProject.features?.map((f, i) => (
-                        <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 text-xs text-slate-200">
+                        <span key={i} className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 rounded-lg text-xs text-slate-800">
                           <span>{f}</span>
                           <button
                             type="button"
@@ -633,68 +536,7 @@ export const AdminProjects: React.FC = () => {
                               next.splice(i, 1);
                               setEditingProject({ ...editingProject, features: next });
                             }}
-                            className="text-slate-400 hover:text-red-400"
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Measurable Results */}
-                  <div className="space-y-2">
-                    <label className="block text-xs font-bold text-white uppercase tracking-wider text-[11px] text-emerald-400">
-                      Measurable Business / Performance Results
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={resultInput}
-                        onChange={(e) => setResultInput(e.target.value)}
-                        placeholder="e.g. 70% decrease in cloud infrastructure costs"
-                        className="flex-1 px-3 py-1.5 text-xs rounded bg-slate-800 border border-slate-700 text-white"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            if (resultInput.trim()) {
-                              setEditingProject({
-                                ...editingProject,
-                                results: [...(editingProject.results || []), resultInput.trim()]
-                              });
-                              setResultInput('');
-                            }
-                          }
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (resultInput.trim()) {
-                            setEditingProject({
-                              ...editingProject,
-                              results: [...(editingProject.results || []), resultInput.trim()]
-                            });
-                            setResultInput('');
-                          }
-                        }}
-                        className="px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded"
-                      >
-                        Add
-                      </button>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {editingProject.results?.map((r, i) => (
-                        <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-950 text-xs text-emerald-300 border border-emerald-800">
-                          <span>{r}</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const next = [...(editingProject.results || [])];
-                              next.splice(i, 1);
-                              setEditingProject({ ...editingProject, results: next });
-                            }}
-                            className="text-emerald-400 hover:text-red-400"
+                            className="text-slate-400 hover:text-red-600"
                           >
                             ×
                           </button>
@@ -705,25 +547,25 @@ export const AdminProjects: React.FC = () => {
                 </div>
               )}
 
-              {/* Modal Actions */}
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+              {/* Modal Footer */}
+              <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:bg-slate-800"
+                  className="px-5 py-2.5 rounded-full text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
                 >
-                  Cancel
+                  Annuler
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md"
+                  className="px-6 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer flex items-center gap-2"
                 >
-                  Save Project Case Study
+                  <Save className="w-4 h-4" />
+                  <span>Enregistrer le Projet</span>
                 </button>
               </div>
 
             </form>
-
           </div>
         </div>
       )}

@@ -1,33 +1,25 @@
 import React, { useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { Experience } from '../../types';
-import { Briefcase, Plus, Edit3, Trash2, Calendar, MapPin, X, CheckCircle2 } from 'lucide-react';
+import { Briefcase, Plus, Edit3, Trash2, Calendar, MapPin, X, Save } from 'lucide-react';
 
 export const AdminExperiences: React.FC = () => {
   const { data, updateData } = useData();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExp, setEditingExp] = useState<Partial<Experience> | null>(null);
 
-  const [respInput, setRespInput] = useState('');
-  const [achieveInput, setAchieveInput] = useState('');
-
   const experiences = data.experiences || [];
-  const technologies = data.technologies || [];
 
   const openCreateModal = () => {
     setEditingExp({
       id: `exp_${Date.now()}`,
-      role: '',
-      company: '',
-      companyUrl: '',
-      location: 'Paris, France (Remote)',
-      contractType: 'Full-time',
-      startDate: '2023-01',
-      endDate: '',
+      company: 'GROUPE DIRECTSOFT',
+      role: 'Développeur Full Stack .NET',
+      location: "Abidjan, Côte d'Ivoire",
+      period: '2023 — Présent',
       isCurrent: true,
-      description: '',
-      responsibilities: [],
-      achievements: [],
+      description: 'Conception et maintenance d’applications de gestion d’entreprise en ASP.NET Core et React.',
+      highlights: [],
       technologyIds: [],
       order: experiences.length + 1
     });
@@ -39,126 +31,98 @@ export const AdminExperiences: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingExp || !editingExp.company) return;
+
+    const exists = experiences.some(e => e.id === editingExp.id);
+    let next: Experience[];
+
+    if (exists) {
+      next = experiences.map(e => e.id === editingExp.id ? (editingExp as Experience) : e);
+    } else {
+      next = [...experiences, editingExp as Experience];
+    }
+
+    await updateData({ experiences: next });
+    setIsModalOpen(false);
+    setEditingExp(null);
+  };
+
   const handleDelete = async (id: string) => {
-    if (confirm('Delete this work experience entry?')) {
+    if (confirm('Supprimer cette expérience ?')) {
       const next = experiences.filter(e => e.id !== id);
       await updateData({ experiences: next });
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingExp?.role || !editingExp?.company) return;
-
-    let nextExps: Experience[] = [];
-    const exists = experiences.some(e => e.id === editingExp.id);
-
-    if (exists) {
-      nextExps = experiences.map(e => e.id === editingExp.id ? (editingExp as Experience) : e);
-    } else {
-      nextExps = [...experiences, editingExp as Experience];
-    }
-
-    await updateData({ experiences: nextExps });
-    setIsModalOpen(false);
-    setEditingExp(null);
-  };
-
-  const toggleTech = (techId: string) => {
-    if (!editingExp) return;
-    const current = editingExp.technologyIds || [];
-    const next = current.includes(techId)
-      ? current.filter(id => id !== techId)
-      : [...current, techId];
-    setEditingExp({ ...editingExp, technologyIds: next });
-  };
-
   return (
-    <div className="space-y-6">
-      
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+    <div className="space-y-6 pb-12 max-w-6xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Briefcase className="w-5 h-5 text-indigo-400" />
-            <span>Work Experience & Engineering Trajectory</span>
+          <h2 className="text-xl font-extrabold text-slate-950 flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-red-600" />
+            <span>Expériences Professionnelles</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Manage your career history, lead roles, technical responsibilities, and quantified achievements.
+          <p className="text-xs text-slate-500 mt-0.5">
+            Gérez vos postes chez GROUPE DIRECTSOFT et vos réalisations d'ingénierie.
           </p>
         </div>
 
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>Add Work Experience</span>
+          <span>Ajouter une Expérience</span>
         </button>
       </div>
 
-      {/* Experience Cards List */}
       <div className="space-y-4">
         {experiences.map((exp) => (
           <div
             key={exp.id}
-            className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row md:items-start justify-between gap-4"
+            className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs hover:border-red-500/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
           >
-            <div className="space-y-2 flex-1">
+            <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-base font-bold text-white">{exp.role}</h3>
-                <span className="text-xs font-semibold text-indigo-400">@ {exp.company}</span>
-                {exp.isCurrent && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
-                    Present
-                  </span>
-                )}
-                {exp.contractType && (
-                  <span className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400">
-                    {exp.contractType}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {exp.startDate} — {exp.isCurrent ? 'Present' : exp.endDate}
+                <h3 className="font-bold text-slate-950 text-base">{exp.role}</h3>
+                <span className="text-xs font-semibold text-red-600 bg-red-50 px-2.5 py-0.5 rounded-full border border-red-200">
+                  {exp.company}
                 </span>
-                {exp.location && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5" />
-                    {exp.location}
+                {exp.isCurrent && (
+                  <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
+                    En poste
                   </span>
                 )}
               </div>
 
-              {exp.description && (
-                <p className="text-xs text-slate-300 line-clamp-2">{exp.description}</p>
-              )}
-
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {exp.technologyIds?.map(tid => {
-                  const tech = technologies.find(t => t.id === tid);
-                  return (
-                    <span key={tid} className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300">
-                      {tech?.name || tid}
-                    </span>
-                  );
-                })}
+              <div className="flex items-center gap-4 text-xs text-slate-500 font-mono">
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <span>{exp.period}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  <span>{exp.location}</span>
+                </span>
               </div>
+
+              <p className="text-xs text-slate-600 max-w-3xl leading-relaxed">
+                {exp.description}
+              </p>
             </div>
 
-            <div className="flex items-center gap-1 shrink-0 pt-2 md:pt-0">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => openEditModal(exp)}
-                className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg"
+                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
               >
                 <Edit3 className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleDelete(exp.id)}
-                className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-lg"
+                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -167,273 +131,91 @@ export const AdminExperiences: React.FC = () => {
         ))}
       </div>
 
-      {/* Edit / Create Modal */}
       {isModalOpen && editingExp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
-          <div className="relative w-full max-w-2xl max-h-[90vh] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between">
-              <h3 className="text-base font-bold text-white">
-                {editingExp.role ? `Edit: ${editingExp.role}` : 'Add Work Experience'}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 sm:p-8 space-y-6 animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+              <h3 className="font-extrabold text-slate-950 text-base">
+                {editingExp.role ? `Modifier : ${editingExp.role}` : 'Ajouter une Expérience'}
               </h3>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-white rounded"
-              >
+              <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-900 rounded-full">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-6 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Role Title *</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingExp.role || ''}
-                    onChange={(e) => setEditingExp({ ...editingExp, role: e.target.value })}
-                    placeholder="e.g. Lead .NET Solutions Architect"
-                    className="w-full px-3 py-2 text-xs rounded bg-slate-800 border border-slate-700 text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Company *</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingExp.company || ''}
-                    onChange={(e) => setEditingExp({ ...editingExp, company: e.target.value })}
-                    className="w-full px-3 py-2 text-xs rounded bg-slate-800 border border-slate-700 text-white"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Contract Type</label>
-                  <input
-                    type="text"
-                    value={editingExp.contractType || ''}
-                    onChange={(e) => setEditingExp({ ...editingExp, contractType: e.target.value })}
-                    placeholder="e.g. CDI / Freelance / Lead"
-                    className="w-full px-3 py-2 text-xs rounded bg-slate-800 border border-slate-700 text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Start Date</label>
-                  <input
-                    type="text"
-                    value={editingExp.startDate || ''}
-                    onChange={(e) => setEditingExp({ ...editingExp, startDate: e.target.value })}
-                    placeholder="e.g. 2022-01"
-                    className="w-full px-3 py-2 text-xs rounded bg-slate-800 border border-slate-700 text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">End Date</label>
-                  <input
-                    type="text"
-                    disabled={editingExp.isCurrent}
-                    value={editingExp.endDate || ''}
-                    onChange={(e) => setEditingExp({ ...editingExp, endDate: e.target.value })}
-                    placeholder="e.g. 2024-06"
-                    className="w-full px-3 py-2 text-xs rounded bg-slate-800 border border-slate-700 text-white disabled:opacity-40"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
+            <form onSubmit={handleSave} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Entreprise *</label>
                 <input
-                  type="checkbox"
-                  id="isCurrentExp"
-                  checked={editingExp.isCurrent || false}
-                  onChange={(e) => setEditingExp({ ...editingExp, isCurrent: e.target.checked })}
-                  className="rounded bg-slate-800 border-slate-700 text-indigo-600"
+                  type="text"
+                  required
+                  value={editingExp.company || ''}
+                  onChange={(e) => setEditingExp({ ...editingExp, company: e.target.value })}
+                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                 />
-                <label htmlFor="isCurrentExp" className="text-xs font-semibold text-slate-300">
-                  I currently work here (Present)
-                </label>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Summary Description</label>
-                <textarea
-                  rows={2}
-                  value={editingExp.description || ''}
-                  onChange={(e) => setEditingExp({ ...editingExp, description: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded bg-slate-800 border border-slate-700 text-white"
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Rôle / Titre *</label>
+                <input
+                  type="text"
+                  required
+                  value={editingExp.role || ''}
+                  onChange={(e) => setEditingExp({ ...editingExp, role: e.target.value })}
+                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                 />
               </div>
 
-              {/* Responsibilities list */}
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-white uppercase tracking-wider text-[11px] text-indigo-400">
-                  Key Technical Responsibilities
-                </label>
-                <div className="flex gap-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Période</label>
                   <input
                     type="text"
-                    value={respInput}
-                    onChange={(e) => setRespInput(e.target.value)}
-                    placeholder="e.g. Led migration to .NET 9 microservices"
-                    className="flex-1 px-3 py-1.5 text-xs rounded bg-slate-800 border border-slate-700 text-white"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        if (respInput.trim()) {
-                          setEditingExp({
-                            ...editingExp,
-                            responsibilities: [...(editingExp.responsibilities || []), respInput.trim()]
-                          });
-                          setRespInput('');
-                        }
-                      }
-                    }}
+                    value={editingExp.period || ''}
+                    onChange={(e) => setEditingExp({ ...editingExp, period: e.target.value })}
+                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                   />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (respInput.trim()) {
-                        setEditingExp({
-                          ...editingExp,
-                          responsibilities: [...(editingExp.responsibilities || []), respInput.trim()]
-                        });
-                        setRespInput('');
-                      }
-                    }}
-                    className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded"
-                  >
-                    Add
-                  </button>
                 </div>
-                <div className="space-y-1">
-                  {editingExp.responsibilities?.map((r, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 rounded bg-slate-800 text-xs text-slate-200">
-                      <span>• {r}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const next = [...(editingExp.responsibilities || [])];
-                          next.splice(i, 1);
-                          setEditingExp({ ...editingExp, responsibilities: next });
-                        }}
-                        className="text-slate-400 hover:text-red-400"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Achievements list */}
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-white uppercase tracking-wider text-[11px] text-emerald-400">
-                  Key Quantified Achievements
-                </label>
-                <div className="flex gap-2">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Localisation</label>
                   <input
                     type="text"
-                    value={achieveInput}
-                    onChange={(e) => setAchieveInput(e.target.value)}
-                    placeholder="e.g. Cut API p99 latency from 450ms to 45ms"
-                    className="flex-1 px-3 py-1.5 text-xs rounded bg-slate-800 border border-slate-700 text-white"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        if (achieveInput.trim()) {
-                          setEditingExp({
-                            ...editingExp,
-                            achievements: [...(editingExp.achievements || []), achieveInput.trim()]
-                          });
-                          setAchieveInput('');
-                        }
-                      }
-                    }}
+                    value={editingExp.location || ''}
+                    onChange={(e) => setEditingExp({ ...editingExp, location: e.target.value })}
+                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
                   />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (achieveInput.trim()) {
-                        setEditingExp({
-                          ...editingExp,
-                          achievements: [...(editingExp.achievements || []), achieveInput.trim()]
-                        });
-                        setAchieveInput('');
-                      }
-                    }}
-                    className="px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded"
-                  >
-                    Add
-                  </button>
-                </div>
-                <div className="space-y-1">
-                  {editingExp.achievements?.map((a, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 rounded bg-emerald-950/50 border border-emerald-800/60 text-xs text-emerald-300">
-                      <span>✓ {a}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const next = [...(editingExp.achievements || [])];
-                          next.splice(i, 1);
-                          setEditingExp({ ...editingExp, achievements: next });
-                        }}
-                        className="text-emerald-400 hover:text-red-400"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
                 </div>
               </div>
 
-              {/* Technologies association */}
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-white uppercase tracking-wider text-[11px] text-indigo-400">
-                  Technologies Used in this Role
-                </label>
-                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2 bg-slate-800 rounded border border-slate-700">
-                  {technologies.map(t => {
-                    const sel = editingExp.technologyIds?.includes(t.id);
-                    return (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() => toggleTech(t.id)}
-                        className={`px-2 py-1 rounded text-[11px] font-semibold transition-colors ${
-                          sel ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        {t.name}
-                      </button>
-                    );
-                  })}
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Description</label>
+                <textarea
+                  rows={3}
+                  value={editingExp.description || ''}
+                  onChange={(e) => setEditingExp({ ...editingExp, description: e.target.value })}
+                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
+                />
               </div>
 
-              <div className="pt-4 border-t border-slate-800 flex justify-end gap-2">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs text-slate-400 hover:bg-slate-800 rounded"
+                  className="px-5 py-2.5 rounded-full text-xs font-semibold text-slate-600 hover:bg-slate-100"
                 >
-                  Cancel
+                  Annuler
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded shadow-md"
+                  className="px-6 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md"
                 >
-                  Save Experience
+                  Enregistrer
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-
     </div>
   );
 };
