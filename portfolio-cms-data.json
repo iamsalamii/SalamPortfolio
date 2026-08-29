@@ -1,0 +1,792 @@
+{
+  "personalInfo": {
+    "firstName": "Moussa Abdou",
+    "lastName": "Salam",
+    "title": "Développeur Full Stack .NET (C#, .NET, React)",
+    "headline": "Développeur Full Stack .NET / React au sein du GROUPE DIRECTSOFT, concevant des architectures logicielles robustes, modulaires et performantes.",
+    "bioShort": "Passionné par le développement d’applications web robustes, je suis actuellement développeur au sein du GROUPE DIRECTSOFT sur des solutions fullstack .NET/React en méthode agile Scrum.",
+    "bioLong": [
+      "Passionné par le développement d’applications web robustes, je suis actuellement développeur au sein du GROUPE DIRECTSOFT sur des solutions fullstack .NET/React.",
+      "À l’aise en méthode agile Scrum, je conçois des architectures logicielles maintenables appliquant les principes SOLID, l'injection de dépendances (ASP.NET Core) et les tests automatisés (xUnit, SpecFlow).",
+      "Mon expertise couvre le backend (C#, ASP.NET Core, Entity Framework Core, SQL Server, PostgreSQL) ainsi que le frontend moderne (React, TypeScript, Tailwind CSS, Razor Pages)."
+    ],
+    "location": "Abidjan, Côte d'Ivoire",
+    "email": "moussasalam86@gmail.com",
+    "phone": "+225 07 09 83 74 55",
+    "avatarUrl": "/assets/maphotops600.jpg",
+    "heroBackgroundUrl": "",
+    "availabilityStatus": "available",
+    "availabilityText": "Disponible pour Missions & Opportunités (2026)",
+    "yearsOfExperience": 2,
+    "specialties": [
+      "C# & ASP.NET Core Web APIs",
+      "Entity Framework Core & SQL Server",
+      "React, TypeScript & Tailwind CSS",
+      "Architecture SOLID & Design Patterns",
+      "Tests Automatisés TDD (xUnit & SpecFlow)",
+      "Agilité SCRUM, Git Flow & Clean Code"
+    ],
+    "cvList": [
+      {
+        "id": "cv-salam",
+        "label": "Curriculum Vitae (Moussa Abdou Salam)",
+        "language": "fr",
+        "url": "/assets/CV_MOUSSA_ABDOU_SALAM.pdf",
+        "updatedAt": "2026-08-29",
+        "isDefault": true
+      }
+    ]
+  },
+  "projectCategories": [
+    {
+      "id": "cat-dotnet",
+      "name": "ASP.NET Core & C#",
+      "slug": "dotnet-csharp",
+      "order": 1
+    },
+    {
+      "id": "cat-fullstack",
+      "name": "Full Stack .NET / React",
+      "slug": "full-stack-dotnet-react",
+      "order": 2
+    },
+    {
+      "id": "cat-erp",
+      "name": "ERP & Gestion d'Entreprise",
+      "slug": "erp-enterprise",
+      "order": 3
+    },
+    {
+      "id": "cat-mobile",
+      "name": "Mobile & React Native",
+      "slug": "mobile-apps",
+      "order": 4
+    }
+  ],
+  "techCategories": [
+    {
+      "id": "tc-backend",
+      "name": "Backend & .NET Ecosystem",
+      "slug": "dotnet-backend",
+      "order": 1
+    },
+    {
+      "id": "tc-frontend",
+      "name": "Frontend & Mobile",
+      "slug": "frontend-ui",
+      "order": 2
+    },
+    {
+      "id": "tc-database",
+      "name": "Bases de données",
+      "slug": "databases",
+      "order": 3
+    },
+    {
+      "id": "tc-tools",
+      "name": "Outils, DevOps & Méthodologies",
+      "slug": "tools-devops",
+      "order": 4
+    }
+  ],
+  "technologies": [
+    {
+      "id": "tech-csharp",
+      "name": "C#",
+      "categoryId": "tc-backend",
+      "categoryName": "Backend & .NET Ecosystem",
+      "icon": "Code2",
+      "description": "LINQ, async/await, POO avancée, records, patterns matching.",
+      "brandColor": "#512BD4",
+      "order": 1,
+      "isActive": true,
+      "isPrimary": true
+    },
+    {
+      "id": "tech-aspnet",
+      "name": "ASP.NET Core",
+      "categoryId": "tc-backend",
+      "categoryName": "Backend & .NET Ecosystem",
+      "icon": "Server",
+      "description": "Web APIs REST, injection de dépendances, middleware, validation de modèles, Swagger.",
+      "brandColor": "#512BD4",
+      "order": 2,
+      "isActive": true,
+      "isPrimary": true
+    },
+    {
+      "id": "tech-efcore",
+      "name": "Entity Framework Core",
+      "categoryId": "tc-backend",
+      "categoryName": "Backend & .NET Ecosystem",
+      "icon": "Layers",
+      "description": "ORM, migrations Code-First, requêtes LINQ optimisées, procédures stockées.",
+      "brandColor": "#512BD4",
+      "order": 3,
+      "isActive": true,
+      "isPrimary": true
+    },
+    {
+      "id": "tech-tests",
+      "name": "Tests xUnit & SpecFlow",
+      "categoryId": "tc-backend",
+      "categoryName": "Backend & .NET Ecosystem",
+      "icon": "CheckCircle2",
+      "description": "TDD, tests unitaires avec xUnit, tests d'intégration avec SpecFlow.",
+      "brandColor": "#10b981",
+      "order": 4,
+      "isActive": true,
+      "isPrimary": true
+    },
+    {
+      "id": "tech-php",
+      "name": "PHP",
+      "categoryId": "tc-backend",
+      "categoryName": "Backend & .NET Ecosystem",
+      "icon": "FileCode2",
+      "description": "Développement web backend et scripts applicatifs.",
+      "brandColor": "#777BB4",
+      "order": 5,
+      "isActive": true,
+      "isPrimary": false
+    },
+    {
+      "id": "tech-react",
+      "name": "React",
+      "categoryId": "tc-frontend",
+      "categoryName": "Frontend & Mobile",
+      "icon": "Code2",
+      "description": "Composants fonctionnels, hooks, gestion d'état, SPA réactives.",
+      "brandColor": "#61DAFB",
+      "order": 1,
+      "isActive": true,
+      "isPrimary": true
+    },
+    {
+      "id": "tech-ts",
+      "name": "TypeScript / JavaScript",
+      "categoryId": "tc-frontend",
+      "categoryName": "Frontend & Mobile",
+      "icon": "FileCode",
+      "description": "Typage statique strict, ES6+, interfaces et modularité.",
+      "brandColor": "#3178C6",
+      "order": 2,
+      "isActive": true,
+      "isPrimary": true
+    },
+    {
+      "id": "tech-tailwind",
+      "name": "Tailwind CSS",
+      "categoryId": "tc-frontend",
+      "categoryName": "Frontend & Mobile",
+      "icon": "Palette",
+      "description": "Design moderne, responsive design fluide et styles personnalisés.",
+      "brandColor": "#38B2AC",
+      "order": 3,
+      "isActive": true,
+      "isPrimary": true
+    },
+    {
+      "id": "tech-bootstrap",
+      "name": "Bootstrap & HTML5/CSS3",
+      "categoryId": "tc-frontend",
+      "categoryName": "Frontend & Mobile",
+      "icon": "Layout",
+      "description": "Intégration responsive, mise en page et styling web moderne.",
+      "brandColor": "#7952B3",
+      "order": 4,
+      "isActive": true,
+      "isPrimary": false
+    },
+    {
+      "id": "tech-reactnative",
+      "name": "React Native & Expo Go",
+      "categoryId": "tc-frontend",
+      "categoryName": "Frontend & Mobile",
+      "icon": "Smartphone",
+      "description": "Développement d'applications mobiles cross-platform iOS & Android.",
+      "brandColor": "#61DAFB",
+      "order": 5,
+      "isActive": true,
+      "isPrimary": false
+    },
+    {
+      "id": "tech-sqlserver",
+      "name": "Microsoft SQL Server",
+      "categoryId": "tc-database",
+      "categoryName": "Bases de données",
+      "icon": "Database",
+      "description": "Modélisation relationnelle, procédures stockées optimisées, indexation et transactions.",
+      "brandColor": "#CC292B",
+      "order": 1,
+      "isActive": true,
+      "isPrimary": true
+    },
+    {
+      "id": "tech-postgres",
+      "name": "PostgreSQL",
+      "categoryId": "tc-database",
+      "categoryName": "Bases de données",
+      "icon": "Database",
+      "description": "Conception de schémas, requêtes complexes et requêtes JSONB.",
+      "brandColor": "#4169E1",
+      "order": 2,
+      "isActive": true,
+      "isPrimary": true
+    },
+    {
+      "id": "tech-mysql",
+      "name": "MySQL",
+      "categoryId": "tc-database",
+      "categoryName": "Bases de données",
+      "icon": "Database",
+      "description": "Gestion de bases de données relationnelles, requêtes et indexation.",
+      "brandColor": "#4479A1",
+      "order": 3,
+      "isActive": true,
+      "isPrimary": false
+    },
+    {
+      "id": "tech-git",
+      "name": "Git / GitHub / GitLab",
+      "categoryId": "tc-tools",
+      "categoryName": "Outils, DevOps & Méthodologies",
+      "icon": "GitBranch",
+      "description": "Gestion de versions, Git Flow, pull requests et revues de code.",
+      "brandColor": "#F05032",
+      "order": 1,
+      "isActive": true,
+      "isPrimary": true
+    },
+    {
+      "id": "tech-vs",
+      "name": "Visual Studio & VS Code",
+      "categoryId": "tc-tools",
+      "categoryName": "Outils, DevOps & Méthodologies",
+      "icon": "Terminal",
+      "description": "Environnements de développement intégrés et profiling de performance.",
+      "brandColor": "#5C2D91",
+      "order": 2,
+      "isActive": true,
+      "isPrimary": true
+    },
+    {
+      "id": "tech-scrum",
+      "name": "Agile SCRUM & UML",
+      "categoryId": "tc-tools",
+      "categoryName": "Outils, DevOps & Méthodologies",
+      "icon": "Sparkles",
+      "description": "Sprints agiles, standups, modélisation UML et spécifications fonctionnelles.",
+      "brandColor": "#10b981",
+      "order": 3,
+      "isActive": true,
+      "isPrimary": true
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-erp-agromex",
+      "title": "ERP-AGROMEX — Module Production & Données",
+      "slug": "erp-agromex-production",
+      "shortDescription": "Refonte et développement de fonctionnalités critiques sur le module de production et traitement de données avec ASP.NET Core, LINQ et SQL Server.",
+      "fullDescription": "Au sein du GROUPE DIRECTSOFT, participation active au développement et à l'optimisation de la solution ERP-AGROMEX. Mise en place d'une architecture modulaire respectant les principes SOLID et l'injection de dépendances, et refonte du traitement des données avec LINQ.",
+      "mainImage": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "technologyIds": [
+        "tech-csharp",
+        "tech-aspnet",
+        "tech-efcore",
+        "tech-sqlserver"
+      ],
+      "categoryId": "cat-erp",
+      "categoryName": "ERP • C# • ASP.NET CORE",
+      "client": "GROUPE DIRECTSOFT",
+      "role": "Développeur .NET",
+      "duration": "En production",
+      "status": "published",
+      "isFeatured": true,
+      "order": 1,
+      "features": [
+        "Architecture modulaire avec injection de dépendances sous ASP.NET Core",
+        "Refonte complète du module de traitement des données avec LINQ",
+        "Optimisation des procédures stockées et des temps de réponse SQL",
+        "Rédaction de la documentation technique et spécifications"
+      ],
+      "challenges": [
+        "Optimiser des requêtes volumineuses sur la chaîne de production."
+      ],
+      "solutions": [
+        "Indexation ciblée des tables SQL et refactoring avec LINQ optimisé."
+      ],
+      "results": [
+        "Gains significatifs de réactivité et meilleure maintenabilité du code."
+      ],
+      "githubUrl": "https://github.com",
+      "liveDemoUrl": "#",
+      "publishedAt": "2024-08-01"
+    },
+    {
+      "id": "proj-directsoft-fullstack",
+      "title": "Plateforme Web Full-Stack .NET & React",
+      "slug": "directsoft-fullstack-solution",
+      "shortDescription": "Application web d'entreprise avec backend ASP.NET Core RESTful, Entity Framework Core et interface moderne en React / Tailwind CSS.",
+      "fullDescription": "Développement d'une solution full-stack complète chez GROUPE DIRECTSOFT avec intégration de tests automatisés (xUnit, SpecFlow) en TDD et interface responsive en React et Tailwind CSS.",
+      "mainImage": "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "technologyIds": [
+        "tech-csharp",
+        "tech-aspnet",
+        "tech-efcore",
+        "tech-react",
+        "tech-ts",
+        "tech-tailwind",
+        "tech-tests"
+      ],
+      "categoryId": "cat-fullstack",
+      "categoryName": ".NET CORE • REACT • TDD",
+      "client": "GROUPE DIRECTSOFT",
+      "role": "Développeur Full-Stack",
+      "duration": "Septembre 2024 - Présent",
+      "status": "published",
+      "isFeatured": true,
+      "order": 2,
+      "features": [
+        "Refonte de l'architecture logicielle avec SOLID et Design Patterns",
+        "Mise en place de tests automatisés (xUnit, SpecFlow)",
+        "Frontend réactif développé sous React, Tailwind CSS et Razor Pages",
+        "Revue de code et application rigoureuse de Git Flow"
+      ],
+      "challenges": [
+        "Garantir zéro régression lors des montées de version."
+      ],
+      "solutions": [
+        "Adoption d'une stratégie de tests TDD et intégration continue."
+      ],
+      "results": [
+        "Stabilité éprouvée et code propre conforme aux standards d'ingénierie."
+      ],
+      "githubUrl": "https://github.com",
+      "liveDemoUrl": "#",
+      "publishedAt": "2025-01-10"
+    }
+  ],
+  "experiences": [
+    {
+      "id": "exp-directsoft-junior",
+      "company": "GROUPE DIRECTSOFT",
+      "role": "Développeur d'Applications .NET Junior",
+      "location": "Abidjan, Côte d'Ivoire",
+      "contractType": "CDI / Full-time",
+      "startDate": "Septembre 2024",
+      "endDate": "Présent",
+      "isCurrent": true,
+      "description": "Refonte complète d'architecture, développement Full-Stack sur solutions .NET / React et application de la méthodologie agile Scrum.",
+      "responsibilities": [
+        "Application des principes SOLID, injection de dépendances (ASP.NET Core) et Design Patterns pour une maintenabilité optimale.",
+        "Développement Full-Stack : Backend (ASP.NET Core, EF Core), Frontend (React, Razor Pages, Bootstrap, Tailwind CSS).",
+        "Optimisation des procédures stockées et des performances SQL Server.",
+        "Mise en place de tests automatisés TDD (xUnit) et tests d'intégration (SpecFlow).",
+        "Revue de code, formation de l'équipe aux bonnes pratiques (Clean Code, Git Flow) et rédaction de spécifications techniques."
+      ],
+      "achievements": [
+        "Architecture robuste et découplée facilitant l'évolution des fonctionnalités.",
+        "Automatisation de la suite de tests garantissant la fiabilité en production."
+      ],
+      "technologyIds": [
+        "tech-csharp",
+        "tech-aspnet",
+        "tech-efcore",
+        "tech-react",
+        "tech-tailwind",
+        "tech-tests",
+        "tech-sqlserver"
+      ],
+      "order": 1
+    },
+    {
+      "id": "exp-directsoft-intern",
+      "company": "GROUPE DIRECTSOFT",
+      "role": "Stagiaire Développeur d'Applications .NET",
+      "location": "Abidjan, Côte d'Ivoire",
+      "contractType": "Stage",
+      "startDate": "Janvier 2024",
+      "endDate": "Août 2024",
+      "isCurrent": false,
+      "description": "Participation au développement de fonctionnalités critiques sur le module de production de l'ERP d'entreprise (ERP-AGROMEX).",
+      "responsibilities": [
+        "Développement de fonctionnalités sur le module production de l'ERP-AGROMEX.",
+        "Architecture modulaire avec principes SOLID et Injection de Dépendances (ASP.NET Core).",
+        "Refonte du module Traitement des données avec requêtes LINQ optimisées.",
+        "Documentation du code et rédaction des documents de spécifications techniques."
+      ],
+      "achievements": [
+        "Optimisation réussie des traitements de données volumineux de l'ERP."
+      ],
+      "technologyIds": [
+        "tech-csharp",
+        "tech-aspnet",
+        "tech-efcore",
+        "tech-sqlserver"
+      ],
+      "order": 2
+    }
+  ],
+  "education": [
+    {
+      "id": "edu-licence",
+      "institution": "Université Virtuelle de Côte d’Ivoire",
+      "degree": "Licence en Sciences Informatique et Numérique",
+      "fieldOfStudy": "Sciences Informatiques & Numérique",
+      "location": "Abidjan, Côte d'Ivoire",
+      "startDate": "2023",
+      "endDate": "En-cours d'obtention",
+      "status": "ongoing",
+      "description": "Formation universitaire supérieure en génie logiciel, algorithmique, bases de données avancées et développement web/mobile.",
+      "order": 1
+    },
+    {
+      "id": "edu-bts",
+      "institution": "Groupe-Cefiat (Abidjan Plateau)",
+      "degree": "BTS Informatique Développeur d’Application (IDA)",
+      "fieldOfStudy": "Développement d’Applications & Génie Logiciel",
+      "location": "Abidjan Plateau, Côte d'Ivoire",
+      "startDate": "Septembre 2021",
+      "endDate": "Août 2023",
+      "status": "graduated",
+      "description": "Diplôme supérieur de développeur d'applications : modélisation UML, POO, architecture logicielle, bases de données relationnelles SQL.",
+      "order": 2
+    },
+    {
+      "id": "edu-bac",
+      "institution": "Lycée Moderne Koumassi",
+      "degree": "Baccalauréat Scientifique Série D",
+      "fieldOfStudy": "Sciences & Mathématiques",
+      "location": "Abidjan, Côte d'Ivoire",
+      "startDate": "2018",
+      "endDate": "Juillet 2021",
+      "status": "graduated",
+      "description": "Formation scientifique avec spécialisation en mathématiques, physique et sciences de la vie et de la terre.",
+      "order": 3
+    }
+  ],
+  "certifications": [
+    {
+      "id": "cert-directsoft",
+      "name": "Attestation d'Ingénierie Full-Stack .NET & React",
+      "issuer": "GROUPE DIRECTSOFT",
+      "issueDate": "2024",
+      "logoUrl": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80",
+      "credentialUrl": "#",
+      "certificatePdfUrl": "#",
+      "description": "Validation de la maîtrise de l'architecture ASP.NET Core, Entity Framework Core, React et de la méthodologie Agile Scrum.",
+      "isActive": true,
+      "order": 1
+    },
+    {
+      "id": "cert-ida",
+      "name": "Brevet de Technicien Supérieur — Développeur d'Application",
+      "issuer": "Ministère de l'Enseignement Supérieur & CEFIAT",
+      "issueDate": "2023",
+      "logoUrl": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80",
+      "credentialUrl": "#",
+      "certificatePdfUrl": "#",
+      "description": "Validation officielle des compétences de concepteur et développeur d'applications logicielles.",
+      "isActive": true,
+      "order": 2
+    }
+  ],
+  "services": [
+    {
+      "id": "srv-dotnet-api",
+      "title": "Développement Web & APIs ASP.NET Core",
+      "description": "Conception et développement de Web APIs REST performantes, modulaires et sécurisées avec C#, ASP.NET Core, EF Core et SQL Server.",
+      "icon": "Server",
+      "features": [
+        "Architecture modulaire & principes SOLID",
+        "Injection de dépendances et middlewares personnalisés",
+        "Optimisation de requêtes LINQ et procédures stockées SQL",
+        "Documentation Swagger et tests automatisés xUnit"
+      ],
+      "ctaText": "Discuter d'un projet",
+      "isActive": true,
+      "order": 1
+    },
+    {
+      "id": "srv-fullstack",
+      "title": "Applications Web Full-Stack .NET / React",
+      "description": "Développement de bout en bout de solutions web d'entreprise combinant une API .NET robuste et une interface moderne en React et Tailwind CSS.",
+      "icon": "Layout",
+      "features": [
+        "Single Page Applications (SPA) dynamiques et réactives",
+        "Design moderne et responsive sous Tailwind CSS",
+        "Méthodologie agile Scrum et rigueur Git Flow",
+        "Tests d'intégration et assurance qualité TDD"
+      ],
+      "ctaText": "Démarrer une collaboration",
+      "isActive": true,
+      "order": 2
+    }
+  ],
+  "socialLinks": [
+    {
+      "id": "soc-linkedin",
+      "platform": "LinkedIn",
+      "label": "LinkedIn",
+      "url": "https://linkedin.com/in/abdou-salam-moussa",
+      "icon": "Linkedin",
+      "order": 1,
+      "displayLocation": "all",
+      "isActive": true
+    },
+    {
+      "id": "soc-github",
+      "platform": "GitHub",
+      "label": "GitHub",
+      "url": "https://github.com",
+      "icon": "Github",
+      "order": 2,
+      "displayLocation": "all",
+      "isActive": true
+    },
+    {
+      "id": "soc-email",
+      "platform": "Email",
+      "label": "Email",
+      "url": "mailto:moussasalam86@gmail.com",
+      "icon": "Mail",
+      "order": 3,
+      "displayLocation": "all",
+      "isActive": true
+    }
+  ],
+  "blogPosts": [],
+  "contactMessages": [],
+  "navigationItems": [
+    {
+      "id": "nav-home",
+      "label": "Accueil",
+      "url": "#home",
+      "order": 1,
+      "isActive": true,
+      "openInNewTab": false,
+      "sectionId": "hero"
+    },
+    {
+      "id": "nav-about",
+      "label": "À propos",
+      "url": "#about",
+      "order": 2,
+      "isActive": true,
+      "openInNewTab": false,
+      "sectionId": "about"
+    },
+    {
+      "id": "nav-experience",
+      "label": "Expérience",
+      "url": "#experience",
+      "order": 3,
+      "isActive": true,
+      "openInNewTab": false,
+      "sectionId": "experience"
+    },
+    {
+      "id": "nav-education",
+      "label": "Formation",
+      "url": "#education",
+      "order": 4,
+      "isActive": true,
+      "openInNewTab": false,
+      "sectionId": "education"
+    },
+    {
+      "id": "nav-skills",
+      "label": "Compétences",
+      "url": "#skills",
+      "order": 5,
+      "isActive": true,
+      "openInNewTab": false,
+      "sectionId": "technologies"
+    },
+    {
+      "id": "nav-projects",
+      "label": "Projets",
+      "url": "#projects",
+      "order": 6,
+      "isActive": true,
+      "openInNewTab": false,
+      "sectionId": "projects"
+    },
+    {
+      "id": "nav-contact",
+      "label": "Contact",
+      "url": "#contact",
+      "order": 7,
+      "isActive": true,
+      "openInNewTab": false,
+      "sectionId": "contact"
+    }
+  ],
+  "pageSections": [
+    {
+      "id": "sec-hero",
+      "sectionKey": "hero",
+      "title": "Accueil",
+      "subtitle": "Présentation",
+      "isEnabled": true,
+      "order": 1
+    },
+    {
+      "id": "sec-about",
+      "sectionKey": "about",
+      "title": "À propos",
+      "subtitle": "Profil & Mindset",
+      "isEnabled": true,
+      "order": 2
+    },
+    {
+      "id": "sec-experience",
+      "sectionKey": "experience",
+      "title": "Expérience",
+      "subtitle": "Parcours Professionnel",
+      "isEnabled": true,
+      "order": 3
+    },
+    {
+      "id": "sec-education",
+      "sectionKey": "education",
+      "title": "Formation",
+      "subtitle": "Cursus Scolaire & Diplômes",
+      "isEnabled": true,
+      "order": 4
+    },
+    {
+      "id": "sec-tech",
+      "sectionKey": "technologies",
+      "title": "Compétences",
+      "subtitle": "Stack Technique & Outils",
+      "isEnabled": true,
+      "order": 5
+    },
+    {
+      "id": "sec-projects",
+      "sectionKey": "projects",
+      "title": "Projets",
+      "subtitle": "Réalisations & Systèmes ERP",
+      "isEnabled": true,
+      "order": 6
+    },
+    {
+      "id": "sec-certifications",
+      "sectionKey": "certifications",
+      "title": "Accréditations",
+      "subtitle": "Certifications",
+      "isEnabled": true,
+      "order": 7
+    },
+    {
+      "id": "sec-contact",
+      "sectionKey": "contact",
+      "title": "Contact",
+      "subtitle": "Me Contacter",
+      "isEnabled": true,
+      "order": 8
+    }
+  ],
+  "languages": [
+    {
+      "code": "fr",
+      "name": "Français",
+      "flag": "🇫🇷",
+      "isDefault": true,
+      "isActive": true,
+      "order": 1
+    },
+    {
+      "code": "en",
+      "name": "English",
+      "flag": "🇺🇸",
+      "isDefault": false,
+      "isActive": true,
+      "order": 2
+    }
+  ],
+  "translations": {
+    "fr": {
+      "nav.home": "Accueil",
+      "nav.about": "À propos",
+      "nav.experience": "Expérience",
+      "nav.education": "Formation",
+      "nav.skills": "Compétences",
+      "nav.projects": "Projets",
+      "nav.contact": "Contact"
+    },
+    "en": {
+      "nav.home": "Home",
+      "nav.about": "About",
+      "nav.experience": "Experience",
+      "nav.education": "Education",
+      "nav.skills": "Skills",
+      "nav.projects": "Projects",
+      "nav.contact": "Contact"
+    }
+  },
+  "mediaItems": [],
+  "siteSettings": {
+    "siteName": "Moussa Abdou Salam — Développeur Full Stack .NET",
+    "ownerName": "Moussa Abdou Salam",
+    "tagline": "Développeur Full Stack .NET (C#, .NET, React)",
+    "description": "Portfolio de Moussa Abdou Salam, Développeur Full Stack .NET / React au sein du GROUPE DIRECTSOFT.",
+    "logoUrl": "",
+    "faviconUrl": "/favicon.svg",
+    "maintenanceMode": false,
+    "maintenanceMessage": "Site en cours d'optimisation.",
+    "currency": "XOF",
+    "currencySymbol": "FCFA",
+    "dateFormat": "YYYY-MM-DD",
+    "timezone": "Africa/Abidjan",
+    "googleAnalyticsId": ""
+  },
+  "themeSettings": {
+    "mode": "dark",
+    "primaryColor": "#512BD4",
+    "secondaryColor": "#06b6d4",
+    "accentColor": "#10b981",
+    "borderRadius": "xl",
+    "fontHeading": "Plus Jakarta Sans",
+    "fontBody": "Inter"
+  },
+  "seoSettings": {
+    "siteTitle": "Moussa Abdou Salam — Développeur Full Stack .NET",
+    "metaDescription": "Portfolio professionnel de Moussa Abdou Salam, Développeur Full Stack .NET / React au sein du GROUPE DIRECTSOFT.",
+    "keywords": "Moussa Abdou Salam, Développeur .NET, C#, ASP.NET Core, React, SQL Server, GROUPE DIRECTSOFT, Abidjan, Portfolio",
+    "ogTitle": "Moussa Abdou Salam — Développeur Full Stack .NET",
+    "ogDescription": "Développeur Full Stack .NET / React concevant des architectures logicielles robustes et performantes.",
+    "ogImage": "/assets/maphotops600.jpg",
+    "canonicalUrl": "https://moussasalam.dev",
+    "robotsPolicy": "index, follow"
+  },
+  "users": [
+    {
+      "id": "usr-salam",
+      "username": "salam",
+      "name": "Moussa Abdou Salam",
+      "email": "moussasalam86@gmail.com",
+      "role": "Super Admin",
+      "isActive": true
+    }
+  ],
+  "activityLogs": [
+    {
+      "id": "log-init",
+      "user": "system",
+      "action": "INIT",
+      "entityType": "System",
+      "details": "Portfolio initialisé avec les données exactes du CV de Moussa Abdou Salam",
+      "timestamp": "2026-08-29T10:10:08.996Z"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "name": "DotNet Developer Portfolio CMS",
+  "description": "Professional data-driven portfolio and administrative CMS for C# / .NET / ASP.NET developers with full content management, theming, i18n, and project showcases.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
