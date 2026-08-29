@@ -4,8 +4,7 @@ import { BrandLogo } from '../common/BrandLogo';
 import { 
   Menu, 
   X, 
-  Shield, 
-  Globe 
+  Shield 
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -20,7 +19,7 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 15);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -36,11 +35,11 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 py-4 px-6 sm:px-8">
-      <div className={`max-w-5xl mx-auto rounded-full px-5 py-2.5 flex items-center justify-between transition-all duration-200 ${
+    <header className="fixed top-0 left-0 w-full z-50 py-4 px-4 sm:px-8">
+      <div className={`max-w-5xl mx-auto rounded-2xl px-6 py-3 flex items-center justify-between transition-all duration-300 ${
         isScrolled
-          ? 'bg-white/90 backdrop-blur-md border border-slate-200 shadow-xs'
-          : 'bg-white/60 backdrop-blur-xs border border-transparent'
+          ? 'bg-white/95 backdrop-blur-xl border border-slate-300/90 shadow-lg shadow-slate-950/5'
+          : 'bg-white/90 backdrop-blur-lg border border-slate-200 shadow-md shadow-slate-950/5'
       }`}>
         
         {/* Brand Logo */}
@@ -51,19 +50,18 @@ export const Navbar: React.FC = () => {
             navigateTo('portfolio');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 hover:opacity-85 transition-opacity"
         >
           <BrandLogo size="sm" />
-          <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
         </a>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6 text-xs font-medium">
+        <nav className="hidden md:flex items-center gap-7 text-xs font-bold">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="text-slate-600 hover:text-red-600 transition-colors"
+              className="text-slate-800 hover:text-red-600 transition-colors tracking-wide"
             >
               {link.label}
             </a>
@@ -71,12 +69,12 @@ export const Navbar: React.FC = () => {
         </nav>
 
         {/* Controls: Language, Admin */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           
-          {/* Language Switcher */}
+          {/* Language Switcher Button */}
           <button
             onClick={() => setActiveLanguage(activeLanguage === 'fr' ? 'en' : 'fr')}
-            className="px-2.5 py-1 rounded-full text-xs font-mono font-bold text-slate-700 hover:text-red-600 hover:bg-red-50 border border-slate-200 transition-colors cursor-pointer"
+            className="px-3 py-1 rounded-lg text-xs font-mono font-bold text-slate-900 hover:text-red-600 bg-slate-100 hover:bg-red-50 border border-slate-300 transition-all cursor-pointer shadow-xs"
             title="Changer de langue"
           >
             {activeLanguage.toUpperCase()}
@@ -86,7 +84,7 @@ export const Navbar: React.FC = () => {
           <button
             onClick={() => navigateTo('admin')}
             title="Espace Administration"
-            className="p-1.5 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+            className="p-2 rounded-lg text-slate-700 hover:text-red-600 bg-slate-100 hover:bg-red-50 border border-slate-300 transition-all cursor-pointer shadow-xs"
           >
             <Shield className="w-3.5 h-3.5" />
           </button>
@@ -94,9 +92,9 @@ export const Navbar: React.FC = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 text-slate-700 hover:text-red-600"
+            className="md:hidden p-2 text-slate-900 hover:text-red-600 bg-slate-100 rounded-lg border border-slate-300"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
 
         </div>
@@ -105,13 +103,13 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Navigation Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden mt-2 max-w-5xl mx-auto p-4 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-3">
+        <div className="md:hidden mt-2 max-w-5xl mx-auto p-5 rounded-2xl bg-white border border-slate-300 shadow-2xl space-y-3 animate-in fade-in zoom-in-95 duration-150">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-medium text-slate-800 hover:text-red-600 py-1"
+              className="block text-sm font-bold text-slate-900 hover:text-red-600 py-1.5"
             >
               {link.label}
             </a>

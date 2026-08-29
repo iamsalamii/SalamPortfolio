@@ -27,7 +27,7 @@ export const LiquidParticlesBackground: React.FC = () => {
       y: -1000,
       targetX: -1000,
       targetY: -1000,
-      radius: 170,
+      radius: 190,
       speed: 0
     };
 
@@ -39,7 +39,7 @@ export const LiquidParticlesBackground: React.FC = () => {
       mouse.targetY = e.clientY;
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
-      mouse.speed = Math.min(Math.hypot(dx, dy), 50);
+      mouse.speed = Math.min(Math.hypot(dx, dy), 60);
       lastX = e.clientX;
       lastY = e.clientY;
     };
@@ -74,27 +74,28 @@ export const LiquidParticlesBackground: React.FC = () => {
     }
 
     const particles: FluidParticle[] = [];
-    const count = Math.min(Math.floor((width * height) / 15000), 50);
+    const count = Math.min(Math.floor((width * height) / 14000), 60);
 
-    const crimsonPalette = ['#dc2626', '#ef4444', '#f87171', '#94a3b8', '#64748b'];
+    // High-contrast palette: Vivid Crimson, Ruby, Obsidian, and Steel
+    const crimsonPalette = ['#dc2626', '#ef4444', '#b91c1c', '#0f172a', '#475569', '#dc2626'];
 
     for (let i = 0; i < count; i++) {
       const x = Math.random() * width;
       const y = Math.random() * height;
-      const baseAlpha = Math.random() * 0.35 + 0.15;
+      const baseAlpha = Math.random() * 0.35 + 0.3; // High base visibility
       particles.push({
         x,
         y,
         originX: x,
         originY: y,
-        vx: (Math.random() - 0.5) * 0.35,
-        vy: (Math.random() - 0.5) * 0.35,
-        size: Math.random() * 2 + 1,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        size: Math.random() * 2.5 + 1.8,
         color: crimsonPalette[Math.floor(Math.random() * crimsonPalette.length)],
         alpha: baseAlpha,
         baseAlpha,
         angle: Math.random() * Math.PI * 2,
-        speed: Math.random() * 0.02 + 0.005
+        speed: Math.random() * 0.025 + 0.008
       });
     }
 
@@ -105,27 +106,27 @@ export const LiquidParticlesBackground: React.FC = () => {
       ctx.clearRect(0, 0, width, height);
 
       // Smooth mouse interpolation
-      mouse.x += (mouse.targetX - mouse.x) * 0.12;
-      mouse.y += (mouse.targetY - mouse.y) * 0.12;
+      mouse.x += (mouse.targetX - mouse.x) * 0.14;
+      mouse.y += (mouse.targetY - mouse.y) * 0.14;
 
-      // Spawn subtle ripples on movement
-      if (mouse.speed > 6 && Math.random() > 0.65) {
+      // Spawn distinct ripples on mouse motion
+      if (mouse.speed > 4 && Math.random() > 0.55) {
         ripples.push({
           x: mouse.x,
           y: mouse.y,
-          radius: 8,
-          maxRadius: Math.min(100 + mouse.speed * 2, 200),
-          alpha: 0.2,
+          radius: 10,
+          maxRadius: Math.min(120 + mouse.speed * 2.5, 240),
+          alpha: 0.45,
           color: '220, 38, 38'
         });
       }
       mouse.speed *= 0.92;
 
-      // Render Liquid Ripples
+      // Render Liquid Ripples with high clarity
       for (let i = ripples.length - 1; i >= 0; i--) {
         const r = ripples[i];
-        r.radius += 2.2;
-        r.alpha *= 0.96;
+        r.radius += 2.8;
+        r.alpha *= 0.95;
 
         if (r.alpha < 0.01 || r.radius >= r.maxRadius) {
           ripples.splice(i, 1);
@@ -136,50 +137,50 @@ export const LiquidParticlesBackground: React.FC = () => {
         ctx.beginPath();
         ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
         ctx.strokeStyle = `rgba(${r.color}, ${r.alpha})`;
-        ctx.lineWidth = 1.2;
+        ctx.lineWidth = 1.8;
         ctx.stroke();
         ctx.restore();
       }
 
-      // Render Ambient Fluid Mesh behind mouse
+      // Render Ambient Crimson Glow behind mouse
       if (mouse.x > 0 && mouse.y > 0) {
-        const fluidGrad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 220);
-        fluidGrad.addColorStop(0, 'rgba(220, 38, 38, 0.05)');
-        fluidGrad.addColorStop(0.5, 'rgba(239, 68, 68, 0.02)');
+        const fluidGrad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 250);
+        fluidGrad.addColorStop(0, 'rgba(220, 38, 38, 0.08)');
+        fluidGrad.addColorStop(0.5, 'rgba(239, 68, 68, 0.03)');
         fluidGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.fillStyle = fluidGrad;
         ctx.fillRect(0, 0, width, height);
       }
 
-      // Update and draw fluid particles
+      // Update and draw fluid particles with high contrast
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
         // Fluid drifting
         p.angle += p.speed;
-        p.x += p.vx + Math.sin(p.angle + time) * 0.35;
-        p.y += p.vy + Math.cos(p.angle + time) * 0.35;
+        p.x += p.vx + Math.sin(p.angle + time) * 0.45;
+        p.y += p.vy + Math.cos(p.angle + time) * 0.45;
 
         if (p.x < 0) p.x = width;
         else if (p.x > width) p.x = 0;
         if (p.y < 0) p.y = height;
         else if (p.y > height) p.y = 0;
 
-        // Mouse displacement & wave interaction
+        // Mouse displacement & wave physics
         const dx = mouse.x - p.x;
         const dy = mouse.y - p.y;
         const dist = Math.hypot(dx, dy);
 
         if (dist < mouse.radius) {
           const force = (1 - dist / mouse.radius);
-          p.x -= (dx / dist) * force * 3;
-          p.y -= (dy / dist) * force * 3;
-          p.alpha = Math.min(p.baseAlpha * 2.5, 0.85);
+          p.x -= (dx / dist) * force * 3.5;
+          p.y -= (dy / dist) * force * 3.5;
+          p.alpha = Math.min(p.baseAlpha * 2.2, 0.95);
         } else {
           p.alpha = p.baseAlpha;
         }
 
-        // Draw particle
+        // Draw particle dot with crisp outline
         ctx.save();
         ctx.globalAlpha = p.alpha;
         ctx.fillStyle = p.color;
@@ -193,12 +194,12 @@ export const LiquidParticlesBackground: React.FC = () => {
           const p2 = particles[j];
           const distNodes = Math.hypot(p.x - p2.x, p.y - p2.y);
 
-          if (distNodes < 110) {
+          if (distNodes < 130) {
             ctx.save();
-            const linkAlpha = (1 - distNodes / 110) * 0.08;
+            const linkAlpha = (1 - distNodes / 130) * 0.22;
             ctx.globalAlpha = linkAlpha;
-            ctx.strokeStyle = '#ef4444';
-            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 1.0;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
@@ -224,7 +225,7 @@ export const LiquidParticlesBackground: React.FC = () => {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.7 }}
+      style={{ opacity: 0.95 }}
     />
   );
 };

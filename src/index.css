@@ -5,7 +5,7 @@
     --color-crimson: #dc2626;
     --color-crimson-light: #ef4444;
     --color-crimson-dark: #991b1b;
-    --color-crimson-glow: rgba(220, 38, 38, 0.2);
+    --color-crimson-glow: rgba(220, 38, 38, 0.25);
     --font-heading: 'Plus Jakarta Sans', 'Outfit', sans-serif;
     --font-display: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, sans-serif;
@@ -15,20 +15,28 @@
   html {
     scroll-behavior: smooth;
     font-family: var(--font-body);
-    background-color: #ffffff;
-    color: #090d16;
+    background-color: #f8fafc;
+    color: #0f172a;
   }
 
   body {
     overflow-x: hidden;
     min-height: 100vh;
-    background-color: #ffffff;
-    color: #090d16;
+    background-color: #f8fafc;
+    color: #0f172a;
+    background-image: 
+      radial-gradient(at 100% 0%, rgba(220, 38, 38, 0.04) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(220, 38, 38, 0.03) 0px, transparent 50%);
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    color: #090d16;
+    color: #020617;
+    font-weight: 800;
+  }
+
+  p {
+    color: #334155;
   }
 
   .font-display {
@@ -42,16 +50,16 @@
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f8fafc;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #94a3b8;
   border-radius: 9999px;
 }
 
@@ -62,20 +70,20 @@
 /* Crimson Studio Card Surfaces */
 .crimson-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 4px 15px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .crimson-card:hover {
-  border-color: rgba(220, 38, 38, 0.4);
+  border-color: rgba(220, 38, 38, 0.55);
   transform: translateY(-3px);
-  box-shadow: 0 20px 35px -10px rgba(220, 38, 38, 0.12), 0 0 0 1px rgba(220, 38, 38, 0.15);
+  box-shadow: 0 20px 35px -10px rgba(220, 38, 38, 0.15), 0 0 0 1px rgba(220, 38, 38, 0.2);
 }
 
 /* Crimson Gradients */
 .text-gradient-crimson {
-  background: linear-gradient(135deg, #090d16 20%, #dc2626 70%, #ef4444 100%);
+  background: linear-gradient(135deg, #020617 20%, #dc2626 70%, #ef4444 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -84,18 +92,6 @@
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 60%, #991b1b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-/* Subtle Technical Grid Background */
-.bg-tech-grid {
-  background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
-}
-
-.bg-radial-crimson {
-  background: radial-gradient(circle at 50% 0%, rgba(220, 38, 38, 0.06), transparent 60%);
 }
 
 @keyframes floatGentle {
