@@ -12,6 +12,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+app.disable("x-powered-by");
+
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 const IS_PROD = process.env.NODE_ENV === "production";
 const JWT_SECRET = process.env.JWT_SECRET || "salam_portfolio_secure_jwt_secret_2026_x9k2m";
@@ -44,6 +46,25 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
+  }
+
+  // Block direct HTTP access to source code and sensitive secret files (.env, *.ts, *.json, *.sql, *.log, *.git)
+  const cleanPath = req.path.toLowerCase();
+  if (
+    !cleanPath.startsWith("/api/") &&
+    (
+      cleanPath.includes(".env") ||
+      cleanPath.endsWith(".ts") ||
+      cleanPath.endsWith(".tsx") ||
+      cleanPath.endsWith(".json") ||
+      cleanPath.endsWith(".sql") ||
+      cleanPath.endsWith(".log") ||
+      cleanPath.includes(".git") ||
+      cleanPath.endsWith(".md") ||
+      cleanPath.endsWith(".lock")
+    )
+  ) {
+    return res.status(403).json({ error: "Accès interdit aux ressources protégées." });
   }
 
   next();
@@ -485,7 +506,7 @@ app.post("/api/auth/verify-otp", async (req: Request, res: Response) => {
   });
 });
 
-// Resend OTP Code
+// Resend OTP Code (Strict: no code leak in response)
 app.post("/api/auth/resend-otp", async (req: Request, res: Response) => {
   const { tempToken } = req.body;
   const session = otpSessions.get(tempToken);
@@ -498,16 +519,18 @@ app.post("/api/auth/resend-otp", async (req: Request, res: Response) => {
   session.expiresAt = Date.now() + 5 * 60 * 1000;
   session.attempts = 3;
 
+  // Log securely to terminal
+  console.log(`[2FA OTP RESEND] New code generated for ${session.personalEmailExpected || session.adminEmail}`);
+
   return res.json({
     success: true,
-    otpPreview: newOtp,
     expiresInSeconds: 300,
-    message: "Nouveau code OTP envoyé."
+    message: "Nouveau code OTP généré et expédié à votre adresse personnelle."
   });
 });
 
-// Test helper: Reset rate limit lock on demand
-app.post("/api/auth/reset-rate-limit", (req: Request, res: Response) => {
+// Admin Security Helper: Reset rate limit lock (Protected by Super Admin Auth)
+app.post("/api/auth/reset-rate-limit", requireAdminAuth, (req: Request, res: Response) => {
   const clientIp = req.ip || req.socket.remoteAddress || "unknown_ip";
   loginRateLimits.delete(clientIp);
   res.json({ success: true, message: "Verrouillage de sécurité réinitialisé avec succès." });

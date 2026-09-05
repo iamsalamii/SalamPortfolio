@@ -52,6 +52,39 @@
         "updatedAt": "2026-08-29",
         "isDefault": true
       }
+    ],
+    "linkedinUrl": "https://www.linkedin.com/in/abdou-salam-moussa-b8a7a5229/",
+    "githubUrl": "https://github.com/iamsalamii",
+    "whatsappUrl": "https://wa.me/2250709837455",
+    "heroStats": [
+      {
+        "id": "stat-1",
+        "indexLabel": "01 // EXP",
+        "value": "+2 ANS",
+        "subtitle": "CONSULTANT, FREELANCE",
+        "icon": "terminal"
+      },
+      {
+        "id": "stat-2",
+        "indexLabel": "02 // STACK",
+        "value": ".NET 9",
+        "subtitle": "C# & ASP.NET CORE",
+        "icon": "code"
+      },
+      {
+        "id": "stat-3",
+        "indexLabel": "03 // DATA",
+        "value": "SQL + PG",
+        "subtitle": "EF CORE & SCHEMAS",
+        "icon": "database"
+      },
+      {
+        "id": "stat-4",
+        "indexLabel": "04 // FRONT",
+        "value": "REACT+TS",
+        "subtitle": "MODERN UI CLIENT",
+        "icon": "layers"
+      }
     ]
   },
   "projectCategories": [
@@ -465,7 +498,7 @@
     {
       "id": "exp-directsoft-intern",
       "company": "GROUPE DIRECTSOFT",
-      "role": "Stagiaire Développeur d'Applications .NET",
+      "role": "Développeur d'Applications .NET",
       "location": "Abidjan, Côte d'Ivoire",
       "contractType": "Stage",
       "startDate": "Janvier 2024",
@@ -595,6 +628,56 @@
   ],
   "blogPosts": [],
   "contactMessages": [
+    {
+      "id": "msg-1788647229117",
+      "name": "<script>alert(\"XSS_NAME\")</script>",
+      "email": "attacker@evil.com",
+      "subject": "<img src=x onerror=alert(1)>",
+      "message": "<iframe src=\"javascript:alert('XSS')\"></iframe> Corps de message sécurisé de test.",
+      "createdAt": "2026-09-05T22:27:09.117Z",
+      "isRead": false,
+      "isArchived": false
+    },
+    {
+      "id": "msg-1788647200710",
+      "name": "<script>alert(\"XSS_NAME\")</script>",
+      "email": "attacker@evil.com",
+      "subject": "<img src=x onerror=alert(1)>",
+      "message": "<iframe src=\"javascript:alert('XSS')\"></iframe> Corps de message sécurisé de test.",
+      "createdAt": "2026-09-05T22:26:40.710Z",
+      "isRead": false,
+      "isArchived": false
+    },
+    {
+      "id": "msg-1788647187014",
+      "name": "<script>alert(\"XSS_NAME\")</script>",
+      "email": "attacker@evil.com",
+      "subject": "<img src=x onerror=alert(1)>",
+      "message": "<iframe src=\"javascript:alert('XSS')\"></iframe> Corps de message sécurisé de test.",
+      "createdAt": "2026-09-05T22:26:27.014Z",
+      "isRead": false,
+      "isArchived": false
+    },
+    {
+      "id": "msg-1788647161092",
+      "name": "<script>alert(\"XSS_NAME\")</script>",
+      "email": "attacker@evil.com",
+      "subject": "<img src=x onerror=alert(1)>",
+      "message": "<iframe src=\"javascript:alert('XSS')\"></iframe> Corps de message sécurisé de test.",
+      "createdAt": "2026-09-05T22:26:01.092Z",
+      "isRead": false,
+      "isArchived": false
+    },
+    {
+      "id": "msg-1788647148963",
+      "name": "<script>alert(\"XSS_NAME\")</script>",
+      "email": "attacker@evil.com",
+      "subject": "<img src=x onerror=alert(1)>",
+      "message": "<iframe src=\"javascript:alert('XSS')\"></iframe> Corps de message sécurisé de test.",
+      "createdAt": "2026-09-05T22:25:48.963Z",
+      "isRead": false,
+      "isArchived": false
+    },
     {
       "id": "msg-1788615646144",
       "name": "sa",
@@ -823,6 +906,102 @@
     }
   ],
   "activityLogs": [
+    {
+      "id": "log-1788647229117-xw79",
+      "user": "visitor",
+      "action": "CREATE",
+      "entityType": "Message",
+      "details": "New inquiry received from <script>alert(\"XSS_NAME\")</script>",
+      "timestamp": "2026-09-05T22:27:09.117Z"
+    },
+    {
+      "id": "log-1788647200711-zzuz",
+      "user": "visitor",
+      "action": "CREATE",
+      "entityType": "Message",
+      "details": "New inquiry received from <script>alert(\"XSS_NAME\")</script>",
+      "timestamp": "2026-09-05T22:26:40.711Z"
+    },
+    {
+      "id": "log-1788647187014-9ytn",
+      "user": "visitor",
+      "action": "CREATE",
+      "entityType": "Message",
+      "details": "New inquiry received from <script>alert(\"XSS_NAME\")</script>",
+      "timestamp": "2026-09-05T22:26:27.014Z"
+    },
+    {
+      "id": "log-1788647186939-suno",
+      "user": "Moussa Abdou Salam",
+      "action": "OTP_CHALLENGE",
+      "entityType": "Security",
+      "details": "OTP challenge initiated for admin session",
+      "timestamp": "2026-09-05T22:26:26.939Z"
+    },
+    {
+      "id": "log-1788647161092-tvdm",
+      "user": "visitor",
+      "action": "CREATE",
+      "entityType": "Message",
+      "details": "New inquiry received from <script>alert(\"XSS_NAME\")</script>",
+      "timestamp": "2026-09-05T22:26:01.092Z"
+    },
+    {
+      "id": "log-1788647159150-tqv0",
+      "user": "Moussa Abdou Salam",
+      "action": "OTP_CHALLENGE",
+      "entityType": "Security",
+      "details": "OTP challenge initiated for admin session",
+      "timestamp": "2026-09-05T22:25:59.150Z"
+    },
+    {
+      "id": "log-1788647148963-c19b",
+      "user": "visitor",
+      "action": "CREATE",
+      "entityType": "Message",
+      "details": "New inquiry received from <script>alert(\"XSS_NAME\")</script>",
+      "timestamp": "2026-09-05T22:25:48.963Z"
+    },
+    {
+      "id": "log-1788647148849-199p",
+      "user": "Moussa Abdou Salam",
+      "action": "OTP_CHALLENGE",
+      "entityType": "Security",
+      "details": "OTP challenge initiated for admin session",
+      "timestamp": "2026-09-05T22:25:48.849Z"
+    },
+    {
+      "id": "log-1788646841113-gg61",
+      "user": "Salam",
+      "action": "UPDATE",
+      "entityType": "Database",
+      "details": "Application content updated",
+      "timestamp": "2026-09-05T22:20:41.113Z"
+    },
+    {
+      "id": "log-1788639033103-g525",
+      "user": "Moussa Abdou Salam",
+      "action": "LOGIN_SUCCESS",
+      "entityType": "Security",
+      "details": "Administrator authenticated with 2FA OTP",
+      "timestamp": "2026-09-05T20:10:33.103Z"
+    },
+    {
+      "id": "log-1788639017624-ucsf",
+      "user": "Moussa Abdou Salam",
+      "action": "OTP_DISPATCHED",
+      "entityType": "Security",
+      "details": "OTP code dispatched to personal address moussasalam86@gmail.com (SMTP: OK)",
+      "timestamp": "2026-09-05T20:10:17.624Z"
+    },
+    {
+      "id": "log-1788639011333-ffhu",
+      "user": "Moussa Abdou Salam",
+      "action": "OTP_CHALLENGE",
+      "entityType": "Security",
+      "details": "OTP challenge initiated for admin session",
+      "timestamp": "2026-09-05T20:10:11.333Z"
+    },
     {
       "id": "log-1788638907498-9b6a",
       "user": "Salam",
