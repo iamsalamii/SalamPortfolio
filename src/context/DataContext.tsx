@@ -463,7 +463,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return {
           success: true,
           message: resData.message,
-          otpPreview: resData.otpPreview
+          isSmtpConfigured: resData.isSmtpConfigured,
+          devOtpCode: resData.devOtpCode
         };
       }
 

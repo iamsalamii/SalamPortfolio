@@ -400,13 +400,19 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
   }
 
   // Log securely to terminal
-  console.log(`\n======================================================\n[2FA OTP SECURITY DISPATCH]\nDESTINATION : ${cleanEmail}\nCODE OTP    : ${otpCode}\nVALIDITY    : 5 minutes\n======================================================\n`);
+  console.log(`\n======================================================\n[2FA OTP SECURITY DISPATCH]\nDESTINATION : ${cleanEmail}\nCODE OTP    : ${otpCode}\nVALIDITY    : 5 minutes\nSMTP STATUS : ${process.env.SMTP_HOST ? "CONNECTÉ (" + process.env.SMTP_HOST + ")" : "NON CONFIGURÉ (Mode Local)"}\n======================================================\n`);
 
   addActivityLog(session.name, "OTP_DISPATCHED", "Security", `OTP code dispatched to personal address ${cleanEmail}`);
 
+  const isSmtpConfigured = !!(process.env.SMTP_HOST && process.env.SMTP_USER);
+
   return res.json({
     success: true,
-    message: `Code OTP de sécurité transmis avec succès à votre adresse personnelle (${cleanEmail}). Consultez votre boîte email.`
+    isSmtpConfigured,
+    message: isSmtpConfigured
+      ? `Code OTP expédié avec succès à votre adresse personnelle (${cleanEmail}). Consultez votre boîte de réception.`
+      : `Mode local actif : Votre serveur n'a pas encore de variables SMTP dans le fichier .env. Le code a été consigné dans la console terminal serveur.`,
+    devOtpCode: isSmtpConfigured ? undefined : otpCode
   });
 });
 
