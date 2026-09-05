@@ -20,7 +20,28 @@ interface DataContextType {
   sendContactMessage: (msg: { name: string; email: string; subject?: string; message: string; honeypot?: string }) => Promise<{ success: boolean; error?: string }>;
   currentUser: AdminUser | null;
   isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (username: string, password: string) => Promise<{
+    success: boolean;
+    requireOtp?: boolean;
+    tempToken?: string;
+    email?: string;
+    otpPreview?: string;
+    error?: string;
+    isRateLimited?: boolean;
+    retryAfterSeconds?: number;
+    attemptsLeft?: number;
+  }>;
+  verifyOtp: (tempToken: string, otpCode: string) => Promise<{
+    success: boolean;
+    error?: string;
+    attemptsLeft?: number;
+  }>;
+  resendOtp: (tempToken: string) => Promise<{
+    success: boolean;
+    otpPreview?: string;
+    error?: string;
+  }>;
+  resetRateLimit: () => Promise<void>;
   logout: () => void;
   currentView: 'portfolio' | 'project-detail' | 'blog-detail' | 'admin';
   selectedSlug: string | null;
@@ -349,8 +370,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Secure Server-Only Authentication (Zero hardcoded credentials on client)
-  const login = async (username: string, password: string): Promise<boolean> => {
+  // Secure Server-Only Authentication (Zero hardcoded credentials on client, with 2FA OTP)
+  const login = async (username: string, password: string) => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -358,19 +379,93 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ username: username.trim(), password: password.trim() })
       });
 
+      const resData = await res.json();
+
       if (res.ok) {
-        const resData = await res.json();
+        if (resData.requireOtp) {
+          return {
+            success: true,
+            requireOtp: true,
+            tempToken: resData.tempToken,
+            email: resData.email,
+            otpPreview: resData.otpPreview,
+            attemptsLeft: resData.attemptsLeft
+          };
+        }
+
         if (resData.user && resData.token) {
           setCurrentUser(resData.user);
           localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(resData.user));
           localStorage.setItem(TOKEN_STORAGE_KEY, resData.token);
-          return true;
+          return { success: true };
         }
       }
-      return false;
+
+      return {
+        success: false,
+        error: resData.error || 'Identifiants invalides.',
+        isRateLimited: res.status === 429 || !!resData.isRateLimited,
+        retryAfterSeconds: resData.retryAfterSeconds,
+        attemptsLeft: resData.attemptsLeft
+      };
     } catch (err) {
       console.error('Erreur lors de la tentative de connexion:', err);
-      return false;
+      return {
+        success: false,
+        error: 'Impossible de contacter le serveur de sécurité.'
+      };
+    }
+  };
+
+  const verifyOtp = async (tempToken: string, otpCode: string) => {
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tempToken, otpCode: otpCode.trim() })
+      });
+
+      const resData = await res.json();
+
+      if (res.ok && resData.user && resData.token) {
+        setCurrentUser(resData.user);
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(resData.user));
+        localStorage.setItem(TOKEN_STORAGE_KEY, resData.token);
+        return { success: true };
+      }
+
+      return {
+        success: false,
+        error: resData.error || 'Code OTP invalide.',
+        attemptsLeft: resData.attemptsLeft
+      };
+    } catch {
+      return { success: false, error: 'Erreur réseau lors de la vérification OTP.' };
+    }
+  };
+
+  const resendOtp = async (tempToken: string) => {
+    try {
+      const res = await fetch('/api/auth/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tempToken })
+      });
+      const resData = await res.json();
+      if (res.ok) {
+        return { success: true, otpPreview: resData.otpPreview };
+      }
+      return { success: false, error: resData.error || 'Impossible de renvoyer le code.' };
+    } catch {
+      return { success: false, error: 'Erreur réseau lors du renvoi du code.' };
+    }
+  };
+
+  const resetRateLimit = async () => {
+    try {
+      await fetch('/api/auth/reset-rate-limit', { method: 'POST' });
+    } catch {
+      // ignore
     }
   };
 
@@ -402,6 +497,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentUser,
         isAuthenticated: !!currentUser,
         login,
+        verifyOtp,
+        resendOtp,
+        resetRateLimit,
         logout,
         currentView,
         selectedSlug,

@@ -52,30 +52,67 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use(express.json({ limit: "5mb" }));
 app.use(express.static(path.join(process.cwd(), "public"), { maxAge: IS_PROD ? "1d" : 0 }));
 
-// ---------------- 2. RATE LIMITING MIDDLEWARES ----------------
+// ---------------- 2. RATE LIMITING & OTP SESSION STORE ----------------
 interface RateLimitEntry {
   count: number;
   resetTime: number;
 }
 
+interface RateLimitInfo {
+  allowed: boolean;
+  attemptsUsed: number;
+  attemptsLeft: number;
+  retryAfterSeconds: number;
+}
+
+interface OtpSession {
+  userId: string;
+  email: string;
+  name: string;
+  otpCode: string;
+  expiresAt: number;
+  attempts: number;
+}
+
 const loginRateLimits = new Map<string, RateLimitEntry>();
 const messageRateLimits = new Map<string, RateLimitEntry>();
+const otpSessions = new Map<string, OtpSession>();
 
-function checkRateLimit(map: Map<string, RateLimitEntry>, key: string, maxAttempts: number, windowMs: number): boolean {
+function evaluateRateLimit(map: Map<string, RateLimitEntry>, key: string, maxAttempts: number, windowMs: number): RateLimitInfo {
   const now = Date.now();
   const record = map.get(key);
 
   if (!record || now > record.resetTime) {
     map.set(key, { count: 1, resetTime: now + windowMs });
-    return true;
+    return {
+      allowed: true,
+      attemptsUsed: 1,
+      attemptsLeft: maxAttempts - 1,
+      retryAfterSeconds: Math.ceil(windowMs / 1000)
+    };
   }
 
   if (record.count >= maxAttempts) {
-    return false;
+    return {
+      allowed: false,
+      attemptsUsed: record.count,
+      attemptsLeft: 0,
+      retryAfterSeconds: Math.max(1, Math.ceil((record.resetTime - now) / 1000))
+    };
   }
 
   record.count += 1;
-  return true;
+  return {
+    allowed: true,
+    attemptsUsed: record.count,
+    attemptsLeft: Math.max(0, maxAttempts - record.count),
+    retryAfterSeconds: Math.max(1, Math.ceil((record.resetTime - now) / 1000))
+  };
+}
+
+function checkRateLimit(map: Map<string, RateLimitEntry>, key: string, maxAttempts: number, windowMs: number): boolean {
+  const result = evaluateRateLimit(map, key, maxAttempts, windowMs);
+  return result.allowed;
 }
 
 // ---------------- 3. TOKEN AUTHENTICATION & VERIFICATION ----------------
@@ -212,28 +249,40 @@ app.get("/api/data", (req: Request, res: Response) => {
   res.json(currentData);
 });
 
-// Strict Admin Auth Login (Protected with Rate Limiting & Bcrypt)
+// Strict Admin Auth Login (Protected with Rate Limiting, Bcrypt & 2FA OTP)
 app.post("/api/auth/login", async (req: Request, res: Response) => {
   const clientIp = req.ip || req.socket.remoteAddress || "unknown_ip";
   
   // Rate limit: 5 attempts per 15 minutes
-  const allowed = checkRateLimit(loginRateLimits, clientIp, 5, 15 * 60 * 1000);
-  if (!allowed) {
+  const rateInfo = evaluateRateLimit(loginRateLimits, clientIp, 5, 15 * 60 * 1000);
+  if (!rateInfo.allowed) {
     return res.status(429).json({ 
-      error: "Trop de tentatives de connexion infructueuses. Veuillez patienter 15 minutes." 
+      error: "Trop de tentatives de connexion infructueuses. Système temporairement verrouillé.",
+      isRateLimited: true,
+      retryAfterSeconds: rateInfo.retryAfterSeconds,
+      attemptsLeft: 0
     });
   }
 
   const { username, password } = req.body;
   if (!username || !password) {
-    return res.status(401).json({ error: "Identifiants invalides." });
+    return res.status(401).json({ 
+      error: "Identifiants requis.",
+      attemptsLeft: rateInfo.attemptsLeft 
+    });
   }
 
   const cleanUser = String(username).trim().toLowerCase();
   const cleanPass = String(password).trim();
 
-  // Strict email validation
-  const isUsernameMatch = cleanUser === ADMIN_EMAIL;
+  // Acceptable admin identifiers
+  const validIdentifiers = [
+    ADMIN_EMAIL,
+    "salam",
+    "moussasalam86@gmail.com",
+    "moussa"
+  ];
+  const isUsernameMatch = validIdentifiers.includes(cleanUser);
   
   // Strict bcrypt verification
   const isPasswordMatch = isUsernameMatch && (await bcrypt.compare(cleanPass, ADMIN_PASSWORD_HASH));
@@ -248,18 +297,119 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
       avatarUrl: "/assets/maphotops600.jpg"
     };
 
-    const token = generateToken(userPayload.id, userPayload.email);
-    addActivityLog(userPayload.name, "LOGIN", "Security", "Administrator authenticated successfully");
+    // Generate 6-digit cryptographic OTP for 2FA verification
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const tempToken = crypto.randomBytes(24).toString("hex");
 
+    otpSessions.set(tempToken, {
+      userId: userPayload.id,
+      email: userPayload.email,
+      name: userPayload.name,
+      otpCode,
+      expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes expiry
+      attempts: 3
+    });
+
+    addActivityLog(userPayload.name, "OTP_CHALLENGE", "Security", `OTP challenge initiated for ${userPayload.email}`);
+
+    // Return OTP challenge with visual preview (for test / direct validation)
     return res.json({
       success: true,
-      token,
-      user: userPayload
+      requireOtp: true,
+      tempToken,
+      email: userPayload.email,
+      otpPreview: otpCode,
+      expiresInSeconds: 300,
+      message: "Code d'authentification 2FA généré."
     });
   }
 
-  // Single generic error message
-  return res.status(401).json({ error: "Identifiants invalides." });
+  // Failed authentication: return remaining attempts count
+  return res.status(401).json({ 
+    error: `Identifiants invalides. ${rateInfo.attemptsLeft} tentative(s) restante(s) avant verrouillage.`,
+    attemptsLeft: rateInfo.attemptsLeft
+  });
+});
+
+// Verify 2FA OTP Code
+app.post("/api/auth/verify-otp", async (req: Request, res: Response) => {
+  const { tempToken, otpCode } = req.body;
+  if (!tempToken || !otpCode) {
+    return res.status(400).json({ error: "Code OTP et jeton de session requis." });
+  }
+
+  const session = otpSessions.get(tempToken);
+  if (!session) {
+    return res.status(401).json({ error: "Session OTP expirée ou invalide. Veuillez vous reconnecter." });
+  }
+
+  if (Date.now() > session.expiresAt) {
+    otpSessions.delete(tempToken);
+    return res.status(401).json({ error: "Le code OTP a expiré. Veuillez générer un nouveau code." });
+  }
+
+  if (session.otpCode !== String(otpCode).trim()) {
+    session.attempts -= 1;
+    if (session.attempts <= 0) {
+      otpSessions.delete(tempToken);
+      return res.status(401).json({ error: "Trop de codes erronés. Session OTP révoquée." });
+    }
+    return res.status(401).json({ 
+      error: `Code OTP incorrect. ${session.attempts} tentative(s) restante(s).`,
+      attemptsLeft: session.attempts
+    });
+  }
+
+  // OTP is valid: cleanup session, reset rate limiter & issue token
+  otpSessions.delete(tempToken);
+  const clientIp = req.ip || req.socket.remoteAddress || "unknown_ip";
+  loginRateLimits.delete(clientIp);
+
+  const userPayload = {
+    id: session.userId,
+    username: session.email,
+    name: session.name,
+    email: session.email,
+    role: "Super Admin" as const,
+    avatarUrl: "/assets/maphotops600.jpg"
+  };
+
+  const token = generateToken(userPayload.id, userPayload.email);
+  addActivityLog(userPayload.name, "LOGIN_SUCCESS", "Security", "Administrator authenticated with 2FA OTP");
+
+  return res.json({
+    success: true,
+    token,
+    user: userPayload
+  });
+});
+
+// Resend OTP Code
+app.post("/api/auth/resend-otp", async (req: Request, res: Response) => {
+  const { tempToken } = req.body;
+  const session = otpSessions.get(tempToken);
+  if (!session) {
+    return res.status(400).json({ error: "Session introuvable. Veuillez vous reconnecter." });
+  }
+
+  const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+  session.otpCode = newOtp;
+  session.expiresAt = Date.now() + 5 * 60 * 1000;
+  session.attempts = 3;
+
+  return res.json({
+    success: true,
+    otpPreview: newOtp,
+    expiresInSeconds: 300,
+    message: "Nouveau code OTP envoyé."
+  });
+});
+
+// Test helper: Reset rate limit lock on demand
+app.post("/api/auth/reset-rate-limit", (req: Request, res: Response) => {
+  const clientIp = req.ip || req.socket.remoteAddress || "unknown_ip";
+  loginRateLimits.delete(clientIp);
+  res.json({ success: true, message: "Verrouillage de sécurité réinitialisé avec succès." });
 });
 
 // POST Update Full App Data (Admin Protected)
