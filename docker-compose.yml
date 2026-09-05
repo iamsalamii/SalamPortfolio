@@ -1,0 +1,54 @@
+# ===================================================================
+# DOCKER COMPOSE - SALAM.DEV (COOLIFY PRODUCTION STACK)
+# ===================================================================
+
+services:
+  # Service 1 : Application Portfolio & CMS
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: salam-portfolio-web
+    restart: always
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-salam@portfolios.com}
+      - ADMIN_DEFAULT_PASSWORD=${ADMIN_DEFAULT_PASSWORD:-Adm!n123@}
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_SERVICE=${SMTP_SERVICE:-gmail}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_FROM=${SMTP_FROM}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres_password_2026}@db:5432/${POSTGRES_DB:-salam_portfolio}?sslmode=disable
+    volumes:
+      - portfolio_data:/app/portfolio_storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Service 2 : Base de Données PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: salam-portfolio-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_password_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-salam_portfolio}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-salam_portfolio}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  portfolio_data:
+  postgres_data:
