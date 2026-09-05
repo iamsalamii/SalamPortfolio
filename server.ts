@@ -249,7 +249,9 @@ app.get("/api/data", (req: Request, res: Response) => {
   res.json(currentData);
 });
 
-// Strict Admin Auth Login (Protected with Rate Limiting, Bcrypt & 2FA OTP)
+// ---------------- 3. AUTHENTICATION & SESSIONS ----------------
+
+// Strict Admin Auth Login (Protected with Rate Limiting, Bcrypt & 2FA OTP Challenge)
 app.post("/api/auth/login", async (req: Request, res: Response) => {
   const clientIp = req.ip || req.socket.remoteAddress || "unknown_ip";
   
@@ -272,17 +274,11 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
     });
   }
 
-  const cleanUser = String(username).trim().toLowerCase();
+  const cleanUser = String(username).trim();
   const cleanPass = String(password).trim();
 
-  // Acceptable admin identifiers
-  const validIdentifiers = [
-    ADMIN_EMAIL,
-    "salam",
-    "moussasalam86@gmail.com",
-    "moussa"
-  ];
-  const isUsernameMatch = validIdentifiers.includes(cleanUser);
+  // Strict single email verification (no aliases)
+  const isUsernameMatch = cleanUser.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   
   // Strict bcrypt verification
   const isPasswordMatch = isUsernameMatch && (await bcrypt.compare(cleanPass, ADMIN_PASSWORD_HASH));
@@ -297,30 +293,27 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
       avatarUrl: "/assets/maphotops600.jpg"
     };
 
-    // Generate 6-digit cryptographic OTP for 2FA verification
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    // Expected personal email configured in personal info
+    const configuredPersonalEmail = (currentData.personalInfo?.email || "moussasalam86@gmail.com").trim().toLowerCase();
+
     const tempToken = crypto.randomBytes(24).toString("hex");
 
     otpSessions.set(tempToken, {
       userId: userPayload.id,
-      email: userPayload.email,
+      adminEmail: userPayload.email,
+      personalEmailExpected: configuredPersonalEmail,
       name: userPayload.name,
-      otpCode,
-      expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes expiry
-      attempts: 3
+      expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes session
+      attempts: 4
     });
 
-    addActivityLog(userPayload.name, "OTP_CHALLENGE", "Security", `OTP challenge initiated for ${userPayload.email}`);
+    addActivityLog(userPayload.name, "OTP_CHALLENGE", "Security", `OTP challenge initiated for admin session`);
 
-    // Return OTP challenge with visual preview (for test / direct validation)
     return res.json({
       success: true,
       requireOtp: true,
       tempToken,
-      email: userPayload.email,
-      otpPreview: otpCode,
-      expiresInSeconds: 300,
-      message: "Code d'authentification 2FA généré."
+      message: "Authentification principale validée. Renseignez votre adresse email personnelle de sécurité pour recevoir le code OTP."
     });
   }
 
@@ -328,6 +321,47 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
   return res.status(401).json({ 
     error: `Identifiants invalides. ${rateInfo.attemptsLeft} tentative(s) restante(s) avant verrouillage.`,
     attemptsLeft: rateInfo.attemptsLeft
+  });
+});
+
+// Request / Send OTP code to verified personal email
+app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
+  const { tempToken, destinationEmail } = req.body;
+  if (!tempToken || !destinationEmail) {
+    return res.status(400).json({ error: "Jeton de session et email personnel de destination requis." });
+  }
+
+  const session = otpSessions.get(tempToken);
+  if (!session) {
+    return res.status(401).json({ error: "Session expirée ou invalide. Veuillez recommencer la connexion." });
+  }
+
+  if (Date.now() > session.expiresAt) {
+    otpSessions.delete(tempToken);
+    return res.status(401).json({ error: "Session expirée. Veuillez recommencer la connexion." });
+  }
+
+  const cleanEmail = String(destinationEmail).trim().toLowerCase();
+  
+  // Validate entered personal email against configured personal email
+  if (cleanEmail !== session.personalEmailExpected) {
+    return res.status(403).json({
+      error: "Cette adresse email personnelle ne correspond pas à celle configurée dans vos paramètres CMS de sécurité."
+    });
+  }
+
+  // Generate 6-digit cryptographic OTP
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  session.otpCode = otpCode;
+  session.otpSentTo = cleanEmail;
+  session.expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes validity
+
+  addActivityLog(session.name, "OTP_DISPATCHED", "Security", `OTP code dispatched to personal address ${cleanEmail}`);
+
+  return res.json({
+    success: true,
+    message: `Code OTP de sécurité transmis avec succès à votre adresse personnelle (${cleanEmail}).`,
+    otpPreview: otpCode
   });
 });
 
@@ -345,7 +379,11 @@ app.post("/api/auth/verify-otp", async (req: Request, res: Response) => {
 
   if (Date.now() > session.expiresAt) {
     otpSessions.delete(tempToken);
-    return res.status(401).json({ error: "Le code OTP a expiré. Veuillez générer un nouveau code." });
+    return res.status(401).json({ error: "Le code OTP a expiré. Veuillez demander un nouveau code." });
+  }
+
+  if (!session.otpCode) {
+    return res.status(400).json({ error: "Veuillez d'abord valider votre adresse email pour recevoir le code OTP." });
   }
 
   if (session.otpCode !== String(otpCode).trim()) {
@@ -367,9 +405,9 @@ app.post("/api/auth/verify-otp", async (req: Request, res: Response) => {
 
   const userPayload = {
     id: session.userId,
-    username: session.email,
+    username: session.adminEmail,
     name: session.name,
-    email: session.email,
+    email: session.adminEmail,
     role: "Super Admin" as const,
     avatarUrl: "/assets/maphotops600.jpg"
   };
@@ -379,8 +417,8 @@ app.post("/api/auth/verify-otp", async (req: Request, res: Response) => {
 
   return res.json({
     success: true,
-    token,
-    user: userPayload
+    user: userPayload,
+    token
   });
 });
 
@@ -538,7 +576,12 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 async function startServer() {
   if (!IS_PROD) {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { 
+        middlewareMode: true,
+        watch: {
+          ignored: ["**/portfolio-cms-data.json", "**/*.json", "**/dist/**"]
+        }
+      },
       appType: "spa",
     });
     app.use(vite.middlewares);

@@ -49,9 +49,6 @@ export const Navbar: React.FC = () => {
           className="flex items-center gap-2 hover:opacity-90 transition-opacity"
         >
           <BrandLogo size="sm" />
-          <span className="hidden sm:inline-block text-[10px] font-mono text-zinc-400 px-2 py-0.5 border border-zinc-800 bg-zinc-900/90 ml-1">
-            C# // .NET 9
-          </span>
         </a>
 
         {/* Desktop Navigation Links */}

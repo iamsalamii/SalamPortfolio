@@ -24,12 +24,17 @@ interface DataContextType {
     success: boolean;
     requireOtp?: boolean;
     tempToken?: string;
-    email?: string;
-    otpPreview?: string;
+    message?: string;
     error?: string;
     isRateLimited?: boolean;
     retryAfterSeconds?: number;
     attemptsLeft?: number;
+  }>;
+  requestOtp: (tempToken: string, destinationEmail: string) => Promise<{
+    success: boolean;
+    message?: string;
+    otpPreview?: string;
+    error?: string;
   }>;
   verifyOtp: (tempToken: string, otpCode: string) => Promise<{
     success: boolean;
@@ -109,10 +114,39 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   });
 
-  const [currentView, setCurrentView] = useState<'portfolio' | 'project-detail' | 'blog-detail' | 'admin'>('portfolio');
-  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'portfolio' | 'project-detail' | 'blog-detail' | 'admin'>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      const path = window.location.pathname;
+      if (hash.startsWith('#admin') || path === '/admin') return 'admin';
+      if (path.startsWith('/projects/') || hash.startsWith('#project/')) return 'project-detail';
+      if (path.startsWith('/blog/') || hash.startsWith('#blog/')) return 'blog-detail';
+    }
+    return 'portfolio';
+  });
+
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      const path = window.location.pathname;
+      if (path.startsWith('/projects/') || hash.startsWith('#project/')) {
+        return path.startsWith('/projects/') ? path.replace('/projects/', '') : hash.replace('#project/', '');
+      }
+      if (path.startsWith('/blog/') || hash.startsWith('#blog/')) {
+        return path.startsWith('/blog/') ? path.replace('/blog/', '') : hash.replace('#blog/', '');
+      }
+    }
+    return null;
+  });
+
   const [activeCvModal, setActiveCvModal] = useState<boolean>(false);
-  const [adminActiveTab, setAdminActiveTab] = useState<string>('dashboard');
+  const [adminActiveTab, setAdminActiveTab] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const tabMatch = window.location.hash.match(/#admin\/(.+)/);
+      if (tabMatch && tabMatch[1]) return tabMatch[1];
+    }
+    return 'dashboard';
+  });
 
   // Load from API on mount
   useEffect(() => {
@@ -387,8 +421,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             success: true,
             requireOtp: true,
             tempToken: resData.tempToken,
-            email: resData.email,
-            otpPreview: resData.otpPreview,
+            message: resData.message,
             attemptsLeft: resData.attemptsLeft
           };
         }
@@ -413,6 +446,35 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return {
         success: false,
         error: 'Impossible de contacter le serveur de sécurité.'
+      };
+    }
+  };
+
+  const requestOtp = async (tempToken: string, destinationEmail: string) => {
+    try {
+      const res = await fetch('/api/auth/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tempToken, destinationEmail: destinationEmail.trim() })
+      });
+
+      const resData = await res.json();
+      if (res.ok) {
+        return {
+          success: true,
+          message: resData.message,
+          otpPreview: resData.otpPreview
+        };
+      }
+
+      return {
+        success: false,
+        error: resData.error || 'Impossible de transmettre le code OTP.'
+      };
+    } catch {
+      return {
+        success: false,
+        error: 'Erreur réseau lors de la demande du code OTP.'
       };
     }
   };
@@ -497,6 +559,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentUser,
         isAuthenticated: !!currentUser,
         login,
+        requestOtp,
         verifyOtp,
         resendOtp,
         resetRateLimit,

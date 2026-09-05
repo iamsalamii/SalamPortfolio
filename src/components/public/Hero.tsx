@@ -37,10 +37,6 @@ export const Hero: React.FC = () => {
             <span>ABIDJAN, CÔTE D'IVOIRE</span>
           </span>
         </div>
-
-        <div className="text-[11px] text-zinc-500 font-bold tracking-widest uppercase">
-          SYS.ID: MAS_DEV_2026 // GROUPE DIRECTSOFT
-        </div>
       </div>
 
       {/* Main Editorial Block: GIANT BOLD MONOSPACE TYPOGRAPHY */}

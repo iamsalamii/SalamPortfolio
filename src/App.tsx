@@ -88,6 +88,7 @@ const MainAppContent: React.FC = () => {
         case 'technologies':
           return <AdminTechnologies />;
         case 'experience':
+        case 'experiences':
           return <AdminExperiences />;
         case 'education':
           return <AdminEducation />;
