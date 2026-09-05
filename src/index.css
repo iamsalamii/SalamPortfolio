@@ -2,41 +2,43 @@
 
 @layer base {
   :root {
-    --color-crimson: #dc2626;
-    --color-crimson-light: #ef4444;
+    --color-crimson: #ef4444;
+    --color-crimson-bright: #ff2a5f;
     --color-crimson-dark: #991b1b;
-    --color-crimson-glow: rgba(220, 38, 38, 0.25);
-    --font-heading: 'Plus Jakarta Sans', 'Outfit', sans-serif;
-    --font-display: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
-    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --color-crimson-glow: rgba(239, 68, 68, 0.35);
+    --font-mono: 'JetBrains Mono', 'Space Mono', 'Fira Code', ui-monospace, monospace;
+    --font-display: 'Space Grotesk', 'JetBrains Mono', monospace;
+    --font-body: 'JetBrains Mono', 'Inter', system-ui, monospace;
   }
 
   html {
     scroll-behavior: smooth;
-    font-family: var(--font-body);
-    background-color: #f8fafc;
-    color: #0f172a;
+    font-family: var(--font-mono);
+    background-color: #060709;
+    color: #f8fafc;
+    color-scheme: dark;
   }
 
   body {
     overflow-x: hidden;
     min-height: 100vh;
-    background-color: #f8fafc;
-    color: #0f172a;
+    background-color: #060709;
+    color: #f8fafc;
+    font-family: var(--font-mono);
     background-image: 
-      radial-gradient(at 100% 0%, rgba(220, 38, 38, 0.04) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(220, 38, 38, 0.03) 0px, transparent 50%);
+      radial-gradient(at 100% 0%, rgba(239, 68, 68, 0.08) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.06) 0px, transparent 50%);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    color: #020617;
+    font-family: var(--font-mono);
+    color: #ffffff;
     font-weight: 800;
+    letter-spacing: -0.04em;
   }
 
   p {
-    color: #334155;
+    color: #a1a1aa;
   }
 
   .font-display {
@@ -48,57 +50,169 @@
   }
 }
 
-/* Custom Scrollbars */
+/* Custom Cyber/Brutalist Dark Scrollbars */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #090a0f;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-  border-radius: 9999px;
+  background: #27272a;
+  border-radius: 0px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #dc2626;
+  background: #ef4444;
 }
 
-/* Crimson Studio Card Surfaces */
-.crimson-card {
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  box-shadow: 0 4px 15px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+/* Brutalist Dark Grid Pattern */
+.bg-grid-dark {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
 }
 
-.crimson-card:hover {
-  border-color: rgba(220, 38, 38, 0.55);
-  transform: translateY(-3px);
-  box-shadow: 0 20px 35px -10px rgba(220, 38, 38, 0.15), 0 0 0 1px rgba(220, 38, 38, 0.2);
+/* Designer Brutalist Card Surfaces */
+.brutalist-card {
+  background: #0d0e14;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.9);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Crimson Gradients */
+.brutalist-card:hover {
+  border-color: #ef4444;
+  transform: translate(-3px, -3px);
+  box-shadow: 6px 6px 0px 0px #ef4444;
+}
+
+/* High-Contrast Crimson Card */
+.brutalist-card-crimson {
+  background: #14070a;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  box-shadow: 4px 4px 0px 0px rgba(239, 68, 68, 0.25);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brutalist-card-crimson:hover {
+  border-color: #ef4444;
+  transform: translate(-3px, -3px);
+  box-shadow: 6px 6px 0px 0px #ef4444;
+}
+
+/* Brutalist Interactive Buttons */
+.brutalist-btn-primary {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.5rem;
+  background-color: #ef4444;
+  color: #ffffff;
+  border: 1px solid #ff6b6b;
+  box-shadow: 4px 4px 0px 0px #ffffff;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.brutalist-btn-primary:hover {
+  background-color: #dc2626;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #ffffff;
+}
+
+.brutalist-btn-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px 0px #ffffff;
+}
+
+.brutalist-btn-secondary {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.5rem;
+  background-color: #12131c;
+  color: #f4f4f5;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 4px 4px 0px 0px #ef4444;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.brutalist-btn-secondary:hover {
+  background-color: #1c1e2d;
+  border-color: #ffffff;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #ef4444;
+}
+
+.brutalist-btn-secondary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px 0px #ef4444;
+}
+
+/* Brutalist Tag Badges */
+.brutalist-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background-color: #111218;
+  color: #d4d4d8;
+}
+
+.brutalist-badge-crimson {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid rgba(239, 68, 68, 0.6);
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #ff6b6b;
+}
+
+/* Ticker Ribbon Marquee */
+@keyframes marqueeLeft {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: 200%;
+  animation: marqueeLeft 28s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Glowing text gradients */
 .text-gradient-crimson {
-  background: linear-gradient(135deg, #020617 20%, #dc2626 70%, #ef4444 100%);
+  background: linear-gradient(135deg, #ffffff 10%, #ef4444 70%, #b91c1c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.text-gradient-ruby {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 60%, #991b1b 100%);
+.text-gradient-white {
+  background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-@keyframes floatGentle {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
-}
-
-.animate-float-gentle {
-  animation: floatGentle 5s ease-in-out infinite;
 }

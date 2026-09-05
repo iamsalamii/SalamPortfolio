@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../../context/DataContext';
-import { Mail, Phone, Copy, Check, Send } from 'lucide-react';
+import { Mail, Phone, Copy, Check, Send, ArrowUpRight } from 'lucide-react';
 
 export const Contact: React.FC = () => {
   const { data, activeLanguage } = useData();
@@ -11,7 +11,7 @@ export const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: activeLanguage === 'fr' ? 'Opportunité .NET / Full-Stack' : 'Full-Stack Collaboration Inquiry',
+    subject: activeLanguage === 'fr' ? 'OPPORTUNITÉ .NET / COLLABORATION' : 'FULL-STACK INQUIRY',
     message: ''
   });
 
@@ -48,127 +48,161 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-20 sm:py-28 max-w-5xl mx-auto px-6 sm:px-8 border-t border-slate-200">
+    <section id="contact" className="py-20 sm:py-28 max-w-6xl mx-auto px-4 sm:px-8 border-t border-zinc-800 font-mono">
       
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 sm:gap-16">
+      {/* Section Header */}
+      <div className="mb-14">
+        <div className="flex items-center gap-3 text-red-500 text-xs font-bold tracking-widest uppercase mb-3">
+          <span className="w-2.5 h-2.5 bg-red-500 inline-block" />
+          <span>// 08. DISPATCH //</span>
+        </div>
+        <h2 className="text-4xl sm:text-6xl md:text-7xl font-black text-white uppercase tracking-tighter">
+          {activeLanguage === 'fr' ? 'CONTACT & TRANSMISSION' : 'GET IN TOUCH'}
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-14 items-start">
         
-        {/* Left: Contact Info */}
+        {/* Left: Contact Info & Terminal Details */}
         <div className="md:col-span-5 space-y-6">
-          <p className="text-xs font-mono uppercase tracking-widest text-red-600 font-bold">
-            07 / Contact
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
-            {activeLanguage === 'fr' ? 'Travaillons ensemble.' : 'Let’s work together.'}
-          </h2>
-          <p className="text-sm text-slate-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-zinc-300 leading-relaxed font-normal">
             {activeLanguage === 'fr'
-              ? "Disponible pour des opportunités en développement logiciel .NET, missions freelance et collaborations techniques."
+              ? "Disponible pour des opportunités en développement logiciel C# / .NET 9, refonte d'architectures, missions freelance et collaborations techniques."
               : "Available for engineering roles, freelance software contracts, and technical collaborations."}
           </p>
 
-          <div className="space-y-3 pt-4 border-t border-slate-200 text-sm">
-            <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-              <span className="font-mono text-xs text-slate-950">{currentEmail}</span>
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between p-4 bg-[#0d0e14] border border-zinc-800 hover:border-red-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.8)] transition-all">
+              <div>
+                <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider block">// EMAIL_DIRECT</span>
+                <span className="font-mono text-xs sm:text-sm text-white font-bold">{currentEmail}</span>
+              </div>
               <button
                 onClick={copyEmailToClipboard}
-                className="text-xs font-medium text-slate-500 hover:text-red-600 transition-colors cursor-pointer"
+                className="p-2 text-zinc-400 hover:text-white bg-zinc-950 border border-zinc-800 transition-colors cursor-pointer"
                 title="Copier l'email"
               >
-                {copiedEmail ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                {copiedEmail ? <Check className="w-4 h-4 text-red-500" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
 
-            <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-              <span className="font-mono text-xs text-slate-950">{currentPhone}</span>
-              <span className="text-[11px] text-slate-400 font-mono">WhatsApp</span>
+            <div className="flex items-center justify-between p-4 bg-[#0d0e14] border border-zinc-800 hover:border-red-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.8)] transition-all">
+              <div>
+                <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider block">// WHATSAPP_TEL</span>
+                <span className="font-mono text-xs sm:text-sm text-white font-bold">{currentPhone}</span>
+              </div>
+              <a
+                href={`https://wa.me/${currentPhone.replace(/\D/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-zinc-400 hover:text-white bg-zinc-950 border border-zinc-800 transition-colors"
+                title="Ouvrir WhatsApp"
+              >
+                <ArrowUpRight className="w-4 h-4 text-red-500" />
+              </a>
             </div>
+          </div>
+
+          <div className="p-4 bg-zinc-950 border border-zinc-800/80 text-xs text-zinc-500 space-y-1">
+            <div className="font-bold text-zinc-400 uppercase">// TIMEZONE : GMT+0 (ABIDJAN)</div>
+            <div>STATUS: ACCUSÉ DE RÉCEPTION SOUS 24H GARANTI</div>
           </div>
         </div>
 
-        {/* Right: Clean Minimal Form */}
+        {/* Right: Brutalist Monospace Form */}
         <div className="md:col-span-7">
           {status === 'success' ? (
-            <div className="p-8 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
-              <p className="text-lg font-bold text-emerald-900">
-                {activeLanguage === 'fr' ? 'Message envoyé avec succès !' : 'Message received successfully!'}
+            <div className="p-8 bg-[#0d0e14] border border-red-500 shadow-[6px_6px_0px_0px_#ef4444] text-center space-y-4 font-mono">
+              <div className="w-12 h-12 bg-red-600 text-white font-black flex items-center justify-center mx-auto text-xl shadow-[0_0_15px_#ef4444]">
+                ✓
+              </div>
+              <p className="text-xl font-black text-white uppercase tracking-tight">
+                {activeLanguage === 'fr' ? 'MESSAGE ENVOYÉ AVEC SUCCÈS !' : 'TRANSMISSION RECEIVED!'}
               </p>
-              <p className="text-xs text-emerald-700">
-                {activeLanguage === 'fr' ? 'Je vous répondrai dès que possible.' : 'I will get back to you shortly.'}
+              <p className="text-xs text-zinc-400">
+                {activeLanguage === 'fr' ? 'Merci pour votre prise de contact. Je vous répondrai dans les plus brefs délais.' : 'Thank you for reaching out. I will respond to your inquiry shortly.'}
               </p>
               <button
                 onClick={() => setStatus('idle')}
-                className="mt-2 text-xs font-semibold text-emerald-800 underline cursor-pointer"
+                className="mt-4 px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 text-xs font-bold uppercase tracking-wider cursor-pointer"
               >
-                {activeLanguage === 'fr' ? 'Envoyer un autre message' : 'Send another message'}
+                {activeLanguage === 'fr' ? '[ ENVOYER UN AUTRE MESSAGE ]' : '[ SEND ANOTHER MESSAGE ]'}
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 font-mono">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 mb-1">
-                    {activeLanguage === 'fr' ? 'Votre nom' : 'Name'}
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">
+                    // 01. VOTRE NOM *
                   </label>
                   <input
                     type="text"
                     required
+                    placeholder="ex: Jean Dupont"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-950 text-sm focus:outline-none focus:border-red-600 focus:bg-white transition-all"
+                    className="w-full px-4 py-3 bg-[#0d0e14] border border-zinc-800 text-white text-xs font-mono focus:outline-none focus:border-red-500 focus:shadow-[4px_4px_0px_0px_#ef4444] transition-all placeholder:text-zinc-600"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 mb-1">
-                    Email
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">
+                    // 02. VOTRE EMAIL *
                   </label>
                   <input
                     type="email"
                     required
+                    placeholder="jean@entreprise.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-950 text-sm focus:outline-none focus:border-red-600 focus:bg-white transition-all"
+                    className="w-full px-4 py-3 bg-[#0d0e14] border border-zinc-800 text-white text-xs font-mono focus:outline-none focus:border-red-500 focus:shadow-[4px_4px_0px_0px_#ef4444] transition-all placeholder:text-zinc-600"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 mb-1">
-                  {activeLanguage === 'fr' ? 'Sujet' : 'Subject'}
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">
+                  // 03. SUJET DU MESSAGE
                 </label>
                 <input
                   type="text"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-950 text-sm focus:outline-none focus:border-red-600 focus:bg-white transition-all"
+                  className="w-full px-4 py-3 bg-[#0d0e14] border border-zinc-800 text-white text-xs font-mono focus:outline-none focus:border-red-500 focus:shadow-[4px_4px_0px_0px_#ef4444] transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 mb-1">
-                  Message
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">
+                  // 04. DÉTAILS DE LA MISSION / QUESTION *
                 </label>
                 <textarea
-                  rows={4}
+                  rows={5}
                   required
+                  placeholder="Décrivez votre besoin technique ou projet..."
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-950 text-sm focus:outline-none focus:border-red-600 focus:bg-white transition-all resize-none"
+                  className="w-full px-4 py-3 bg-[#0d0e14] border border-zinc-800 text-white text-xs font-mono focus:outline-none focus:border-red-500 focus:shadow-[4px_4px_0px_0px_#ef4444] transition-all resize-none placeholder:text-zinc-600"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={status === 'submitting'}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold text-sm shadow-[0_4px_20px_rgba(220,38,38,0.25)] hover:shadow-[0_6px_25px_rgba(220,38,38,0.35)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="brutalist-btn-primary w-full sm:w-auto"
               >
-                <Send className="w-4 h-4" />
-                <span>{status === 'submitting' ? (activeLanguage === 'fr' ? 'Envoi...' : 'Sending...') : (activeLanguage === 'fr' ? 'Envoyer le message' : 'Send Message')}</span>
+                <Send className="w-4 h-4 stroke-[2.5]" />
+                <span>
+                  {status === 'submitting' 
+                    ? (activeLanguage === 'fr' ? 'ENVOI EN COURS...' : 'TRANSMITTING...') 
+                    : (activeLanguage === 'fr' ? 'ENVOYER LE MESSAGE' : 'DISPATCH MESSAGE')}
+                </span>
               </button>
 
               {status === 'error' && (
-                <p className="text-xs text-red-600 mt-2 font-mono">
-                  {activeLanguage === 'fr' ? "Erreur lors de l'envoi. Veuillez réessayer." : 'Error sending message. Please try again.'}
+                <p className="text-xs text-red-500 mt-2 font-mono font-bold">
+                  // ERREUR DE TRANSMISSION. VEUILLEZ RÉESSAYER OU CONTACTER DIRECTEMENT PAR EMAIL.
                 </p>
               )}
             </form>

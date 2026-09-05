@@ -17,10 +17,10 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   return (
     <div className={`flex items-center gap-1.5 group select-none ${className}`}>
-      <span className={`${sizeClasses[size]} font-black tracking-tight text-slate-950 transition-colors duration-300 font-display`}>
-        Salam
+      <span className={`${sizeClasses[size]} font-black tracking-tighter text-white group-hover:text-red-400 transition-colors duration-200 font-mono`}>
+        SALAM<span className="text-red-500">_</span>
       </span>
-      <span className="w-2 h-2 rounded-full bg-red-600 shadow-[0_0_10px_#dc2626] inline-block transition-transform duration-300 group-hover:scale-125" />
+      <span className="w-2 h-2 bg-red-600 shadow-[0_0_10px_#ef4444] inline-block transition-transform duration-200 group-hover:rotate-45" />
     </div>
   );
 };

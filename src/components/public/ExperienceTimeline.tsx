@@ -1,5 +1,6 @@
 import React from 'react';
 import { useData } from '../../context/DataContext';
+import { Briefcase, Building2, MapPin } from 'lucide-react';
 
 export const ExperienceTimeline: React.FC = () => {
   const { data, activeLanguage } = useData();
@@ -8,66 +9,94 @@ export const ExperienceTimeline: React.FC = () => {
   if (experiences.length === 0) return null;
 
   return (
-    <section id="experience" className="py-20 sm:py-28 max-w-5xl mx-auto px-6 sm:px-8 border-t border-slate-200">
+    <section id="experience" className="py-20 sm:py-28 max-w-6xl mx-auto px-4 sm:px-8 border-t border-zinc-800 font-mono">
       
       {/* Section Header */}
-      <div className="mb-12">
-        <p className="text-xs font-mono uppercase tracking-widest text-red-600 font-bold mb-2">
-          02 / {activeLanguage === 'fr' ? 'Parcours' : 'Experience'}
-        </p>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
-          {activeLanguage === 'fr' ? 'Expérience Professionnelle' : 'Work Experience'}
+      <div className="mb-14">
+        <div className="flex items-center gap-3 text-red-500 text-xs font-bold tracking-widest uppercase mb-3">
+          <span className="w-2.5 h-2.5 bg-red-500 inline-block" />
+          <span>// 04. TRACK RECORD //</span>
+        </div>
+        <h2 className="text-4xl sm:text-6xl md:text-7xl font-black text-white uppercase tracking-tighter">
+          {activeLanguage === 'fr' ? 'PARCOURS EN ENTREPRISE' : 'CAREER & EXPERIENCE'}
         </h2>
       </div>
 
-      {/* Editorial Timeline List */}
-      <div className="space-y-12">
-        {experiences.map((exp) => (
-          <div key={exp.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 pb-10 border-b border-slate-200 last:border-0">
-            
-            {/* Left: Period & Status */}
-            <div className="md:col-span-4 space-y-1">
-              <span className="text-xs font-mono text-slate-500 block">
-                {exp.startDate} — {exp.isCurrent ? (activeLanguage === 'fr' ? 'Présent' : 'Present') : exp.endDate}
-              </span>
-              <p className="text-sm font-bold text-slate-950">
-                {exp.company}
-              </p>
-              {exp.location && (
-                <p className="text-xs text-slate-400 font-mono">
-                  {exp.location}
-                </p>
-              )}
-            </div>
-
-            {/* Right: Role & Responsibilities */}
-            <div className="md:col-span-8 space-y-3">
-              <div className="flex items-center gap-3">
-                <h3 className="text-lg font-bold text-slate-950">
-                  {exp.role}
-                </h3>
-                {exp.isCurrent && (
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-red-100 text-red-700 font-semibold border border-red-200">
-                    {activeLanguage === 'fr' ? 'Actuel' : 'Current'}
+      {/* Brutalist Timeline Cards List */}
+      <div className="space-y-6">
+        {experiences.map((exp, idx) => (
+          <div 
+            key={exp.id || idx} 
+            className={`p-6 sm:p-8 bg-[#0d0e14] border transition-all duration-200 group ${
+              exp.isCurrent 
+                ? 'border-red-500/80 shadow-[6px_6px_0px_0px_#ef4444]' 
+                : 'border-zinc-800 hover:border-red-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.8)] hover:shadow-[5px_5px_0px_0px_#ef4444]'
+            }`}
+          >
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-4 border-b border-zinc-800/80">
+              
+              {/* Role & Company */}
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span className="text-xs text-red-500 font-bold tracking-widest uppercase">
+                    EXP_0{idx + 1} //
                   </span>
-                )}
+                  <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight group-hover:text-red-400 transition-colors">
+                    {exp.role}
+                  </h3>
+                  {exp.isCurrent && (
+                    <span className="text-[10px] font-mono px-2 py-0.5 bg-red-600 text-white font-black uppercase tracking-wider">
+                      {activeLanguage === 'fr' ? 'POSTE ACTUEL' : 'ACTIVE'}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
+                  <span className="flex items-center gap-1.5 font-bold text-zinc-200">
+                    <Building2 className="w-3.5 h-3.5 text-red-500" />
+                    <span>{exp.company}</span>
+                  </span>
+                  {exp.location && (
+                    <>
+                      <span className="text-zinc-600">•</span>
+                      <span className="flex items-center gap-1 text-zinc-400">
+                        <MapPin className="w-3.5 h-3.5 text-red-500/70" />
+                        <span>{exp.location}</span>
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
 
+              {/* Period Pill */}
+              <div className="shrink-0 font-mono text-xs font-bold text-red-400 px-3 py-1.5 bg-zinc-950 border border-zinc-800">
+                {exp.startDate} → {exp.isCurrent ? (activeLanguage === 'fr' ? 'PRÉSENT' : 'PRESENT') : exp.endDate}
+              </div>
+
+            </div>
+
+            {/* Description & Tasks */}
+            <div className="pt-4 space-y-3 text-sm text-zinc-300 leading-relaxed">
               {exp.description && (
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-zinc-300 font-normal">
                   {exp.description}
                 </p>
               )}
 
               {exp.responsibilities && exp.responsibilities.length > 0 && (
-                <ul className="space-y-1.5 pt-1">
-                  {exp.responsibilities.map((resp, i) => (
-                    <li key={i} className="text-xs text-slate-600 leading-relaxed flex items-start gap-2">
-                      <span className="text-red-500 mt-1 font-bold">•</span>
-                      <span>{resp}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="pt-2 space-y-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block">
+                    // MISSIONS PRINCIPALES :
+                  </span>
+                  <ul className="space-y-1.5">
+                    {exp.responsibilities.map((resp, i) => (
+                      <li key={i} className="text-xs text-zinc-400 flex items-start gap-2.5">
+                        <span className="text-red-500 font-bold shrink-0">[&gt;]</span>
+                        <span>{resp}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </div>
 

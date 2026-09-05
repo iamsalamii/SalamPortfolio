@@ -19,12 +19,12 @@ export const ProjectDetail: React.FC = () => {
 
   if (!project) {
     return (
-      <div className="py-24 text-center max-w-xl mx-auto px-4">
-        <h2 className="text-2xl font-extrabold text-slate-950 mb-4">Projet introuvable</h2>
-        <p className="text-sm text-slate-500 mb-6">Le projet sélectionné n'a pas pu être chargé.</p>
+      <div className="py-24 text-center max-w-xl mx-auto px-4 font-mono">
+        <h2 className="text-2xl font-black text-white mb-4">// PROJET INTROUVABLE //</h2>
+        <p className="text-sm text-zinc-400 mb-6">Le projet sélectionné n'a pas pu être chargé.</p>
         <button
           onClick={() => navigateTo('portfolio')}
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_#ffffff] transition-all cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{activeLanguage === 'fr' ? 'Retour aux projets' : 'Back to Projects'}</span>
@@ -38,17 +38,17 @@ export const ProjectDetail: React.FC = () => {
   const images = [project.mainImage, ...(project.gallery || [])].filter(Boolean);
 
   return (
-    <article className="py-12 md:py-20 max-w-5xl mx-auto px-6 sm:px-8">
+    <article className="py-12 md:py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 font-mono text-zinc-300">
       <div className="space-y-12">
         
         {/* Navigation & Back Action */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800/80 pb-6">
           <button
             onClick={() => navigateTo('portfolio')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-red-50 text-slate-700 hover:text-red-600 text-xs font-semibold border border-slate-200 shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white text-xs font-bold uppercase tracking-wider border border-zinc-700 transition-all cursor-pointer shadow-[2px_2px_0px_#ef4444]"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{activeLanguage === 'fr' ? 'Retour aux projets' : 'Back to Projects'}</span>
+            <span>{activeLanguage === 'fr' ? '← RETOUR PROJETS' : '← BACK TO PROJECTS'}</span>
           </button>
 
           <div className="flex items-center gap-3">
@@ -57,10 +57,10 @@ export const ProjectDetail: React.FC = () => {
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-semibold hover:bg-red-600 transition-colors shadow-xs"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 border border-zinc-700 hover:border-zinc-500 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_#ffffff]"
               >
-                <Github className="w-3.5 h-3.5" />
-                <span>Code Source</span>
+                <Github className="w-4 h-4" />
+                <span>CODE_SOURCE</span>
               </a>
             )}
             {project.liveDemoUrl && (
@@ -68,60 +68,60 @@ export const ProjectDetail: React.FC = () => {
                 href={project.liveDemoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-red-600 text-white text-xs font-bold hover:bg-red-700 transition-colors shadow-xs"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white text-xs font-black uppercase tracking-wider transition-all shadow-[3px_3px_0px_#ffffff]"
               >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>Démo en ligne</span>
+                <ExternalLink className="w-4 h-4" />
+                <span>DÉMO EN LIGNE</span>
               </a>
             )}
           </div>
         </div>
 
         {/* Hero Meta Header */}
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="space-y-6">
+          <div className="flex flex-wrap items-center gap-3">
             {category && (
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-600 border border-red-200">
-                {category.name}
+              <span className="px-3 py-1 text-xs font-black uppercase tracking-widest bg-red-600/10 text-red-400 border border-red-500/40">
+                // {category.name}
               </span>
             )}
             {project.status && (
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 uppercase tracking-wider text-[10px]">
-                {project.status}
+              <span className="px-3 py-1 text-[11px] font-bold uppercase tracking-widest bg-zinc-900 text-zinc-300 border border-zinc-800">
+                STATUS: {project.status}
               </span>
             )}
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase leading-tight">
             {project.title}
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-4xl">
+          <p className="text-base sm:text-lg text-zinc-300 leading-relaxed max-w-4xl font-normal">
             {project.shortDescription}
           </p>
 
           {/* Quick Details Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-2xl bg-white border border-slate-200 text-xs shadow-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 bg-[#0a0b0f] border border-zinc-800 text-xs">
             <div>
-              <span className="text-slate-400 font-mono text-[11px] block">Rôle</span>
-              <span className="font-bold text-slate-900 text-sm">{project.role}</span>
+              <span className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">// RÔLE</span>
+              <span className="font-bold text-white text-sm mt-0.5 block">{project.role}</span>
             </div>
             {project.client && (
               <div>
-                <span className="text-slate-400 font-mono text-[11px] block">Client / Entreprise</span>
-                <span className="font-bold text-slate-900 text-sm">{project.client}</span>
+                <span className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">// CLIENT / ORGANISATION</span>
+                <span className="font-bold text-white text-sm mt-0.5 block">{project.client}</span>
               </div>
             )}
             {project.duration && (
               <div>
-                <span className="text-slate-400 font-mono text-[11px] block">Durée</span>
-                <span className="font-bold text-slate-900 text-sm">{project.duration}</span>
+                <span className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">// DURÉE</span>
+                <span className="font-bold text-white text-sm mt-0.5 block">{project.duration}</span>
               </div>
             )}
             {project.publishedAt && (
               <div>
-                <span className="text-slate-400 font-mono text-[11px] block">Livraison</span>
-                <span className="font-bold text-slate-900 text-sm">{project.publishedAt}</span>
+                <span className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider block">// DATE LIVRAISON</span>
+                <span className="font-bold text-white text-sm mt-0.5 block">{project.publishedAt}</span>
               </div>
             )}
           </div>
@@ -129,8 +129,8 @@ export const ProjectDetail: React.FC = () => {
 
         {/* Gallery / Main Preview */}
         {images.length > 0 && (
-          <div className="space-y-3">
-            <div className="aspect-video w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-md">
+          <div className="space-y-4">
+            <div className="aspect-video w-full overflow-hidden bg-black border-2 border-zinc-800 shadow-[6px_6px_0px_#ef4444]">
               <img
                 src={images[activeImageIndex] || images[0]}
                 alt={project.title}
@@ -144,10 +144,10 @@ export const ProjectDetail: React.FC = () => {
                   <button
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`relative w-24 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
+                    className={`relative w-28 h-18 overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
                       activeImageIndex === idx
-                        ? 'border-red-600 ring-2 ring-red-500/20'
-                        : 'border-transparent opacity-60 hover:opacity-100'
+                        ? 'border-red-500 ring-2 ring-red-500/40'
+                        : 'border-zinc-800 opacity-60 hover:opacity-100'
                     }`}
                   >
                     <img src={img} alt={`Capture ${idx + 1}`} className="w-full h-full object-cover" />
@@ -160,8 +160,8 @@ export const ProjectDetail: React.FC = () => {
 
         {/* Full Case Study Content */}
         {project.fullDescription && (
-          <div className="rounded-3xl bg-white p-6 sm:p-8 border border-slate-200 shadow-xs">
-            <div className="markdown-body text-slate-800 leading-relaxed">
+          <div className="bg-[#0a0b0f] p-6 sm:p-10 border border-zinc-800">
+            <div className="markdown-body text-zinc-200 leading-relaxed font-normal">
               <Markdown>{project.fullDescription}</Markdown>
             </div>
           </div>
@@ -169,12 +169,12 @@ export const ProjectDetail: React.FC = () => {
 
         {/* Architecture Notes */}
         {project.architectureNotes && (
-          <div className="p-6 sm:p-8 rounded-3xl bg-red-50/50 border border-red-200 shadow-xs">
-            <h3 className="text-base font-bold text-red-950 mb-2 flex items-center gap-2">
-              <Layers className="w-5 h-5 text-red-600" />
-              <span>Architecture &amp; Conception Système</span>
+          <div className="p-6 sm:p-8 bg-zinc-950/80 border-l-4 border-l-red-500 border border-zinc-800">
+            <h3 className="text-sm font-black text-white mb-2 uppercase tracking-wider flex items-center gap-2">
+              <Layers className="w-4 h-4 text-red-500" />
+              <span>// ARCHITECTURE &amp; CONCEPTION SYSTÈME //</span>
             </h3>
-            <p className="text-sm text-slate-700 leading-relaxed font-mono">
+            <p className="text-sm text-zinc-300 leading-relaxed font-mono">
               {project.architectureNotes}
             </p>
           </div>
@@ -183,14 +183,14 @@ export const ProjectDetail: React.FC = () => {
         {/* Key Features */}
         {project.features && project.features.length > 0 && (
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-slate-950 flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-red-600" />
-              <span>Fonctionnalités Clés &amp; Ingénierie</span>
+            <h3 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-red-500" />
+              <span>// FONCTIONNALITÉS CLÉS //</span>
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {project.features.map((feat, i) => (
-                <div key={i} className="p-4 rounded-2xl bg-white border border-slate-200 text-sm text-slate-800 flex items-start gap-3 shadow-xs">
-                  <span className="w-2 h-2 rounded-full bg-red-600 shrink-0 mt-1.5" />
+                <div key={i} className="p-4 bg-[#0a0b0f] border border-zinc-800 text-sm text-zinc-200 flex items-start gap-3">
+                  <span className="text-red-500 font-bold shrink-0">[✓]</span>
                   <span>{feat}</span>
                 </div>
               ))}
@@ -202,15 +202,15 @@ export const ProjectDetail: React.FC = () => {
         {((project.challenges && project.challenges.length > 0) || (project.solutions && project.solutions.length > 0)) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {project.challenges && project.challenges.length > 0 && (
-              <div className="p-6 rounded-3xl bg-amber-50/50 border border-amber-200 space-y-3 shadow-xs">
-                <h4 className="text-base font-bold text-amber-950 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-amber-600" />
-                  <span>Défis Techniques</span>
+              <div className="p-6 bg-zinc-950 border border-zinc-800 space-y-3">
+                <h4 className="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-400" />
+                  <span>// DÉFIS TECHNIQUES //</span>
                 </h4>
-                <ul className="space-y-2 text-sm text-amber-900">
+                <ul className="space-y-2 text-sm text-zinc-300">
                   {project.challenges.map((chal, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="font-bold text-amber-600">•</span>
+                      <span className="font-bold text-amber-400">[!]</span>
                       <span>{chal}</span>
                     </li>
                   ))}
@@ -219,15 +219,15 @@ export const ProjectDetail: React.FC = () => {
             )}
 
             {project.solutions && project.solutions.length > 0 && (
-              <div className="p-6 rounded-3xl bg-emerald-50/50 border border-emerald-200 space-y-3 shadow-xs">
-                <h4 className="text-base font-bold text-emerald-950 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                  <span>Solutions Apportées</span>
+              <div className="p-6 bg-zinc-950 border border-zinc-800 space-y-3">
+                <h4 className="text-sm font-black text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>// SOLUTIONS DÉPLOYÉES //</span>
                 </h4>
-                <ul className="space-y-2 text-sm text-emerald-900">
+                <ul className="space-y-2 text-sm text-zinc-300">
                   {project.solutions.map((sol, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="font-bold text-emerald-600">•</span>
+                      <span className="font-bold text-emerald-400">[✓]</span>
                       <span>{sol}</span>
                     </li>
                   ))}
@@ -239,14 +239,14 @@ export const ProjectDetail: React.FC = () => {
 
         {/* Measurable Results */}
         {project.results && project.results.length > 0 && (
-          <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
-            <h3 className="text-lg font-bold text-slate-950 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-red-600" />
-              <span>Impact &amp; Résultats Métriques</span>
+          <div className="p-6 sm:p-8 bg-[#0a0b0f] border border-zinc-800 space-y-4">
+            <h3 className="text-base font-black text-white uppercase tracking-wider flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-red-500" />
+              <span>// IMPACT &amp; MÉTRIQUES //</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               {project.results.map((res, i) => (
-                <div key={i} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-900">
+                <div key={i} className="p-4 bg-zinc-900/60 border border-zinc-800 text-sm font-bold text-white">
                   {res}
                 </div>
               ))}
@@ -256,15 +256,15 @@ export const ProjectDetail: React.FC = () => {
 
         {/* Tech Stack Chips */}
         {technologies.length > 0 && (
-          <div className="space-y-3 pt-4 border-t border-slate-200">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
-              Technologies Utilisées
+          <div className="space-y-3 pt-6 border-t border-zinc-800">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500">
+              // ARSENAL TECHNIQUE DU PROJET //
             </h4>
             <div className="flex flex-wrap gap-2">
               {technologies.map(tech => (
                 <span
                   key={tech.id}
-                  className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white text-slate-800 border border-slate-200 shadow-xs"
+                  className="px-3 py-1 text-xs font-bold bg-zinc-900 text-zinc-200 border border-zinc-800"
                 >
                   {tech.name}
                 </span>
@@ -277,3 +277,4 @@ export const ProjectDetail: React.FC = () => {
     </article>
   );
 };
+

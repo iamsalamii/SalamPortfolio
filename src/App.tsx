@@ -191,7 +191,7 @@ const MainAppContent: React.FC = () => {
           }}
         />
       )}
-      <div className="min-h-screen flex flex-col bg-white text-slate-950 relative overflow-x-hidden">
+      <div className="min-h-screen flex flex-col bg-[#060709] text-zinc-100 relative overflow-x-hidden font-mono bg-grid-dark selection:bg-red-600 selection:text-white">
         <LiquidParticlesBackground />
         <Navbar />
         <main className="flex-1 relative z-10">

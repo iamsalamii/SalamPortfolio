@@ -76,20 +76,20 @@ export const LiquidParticlesBackground: React.FC = () => {
     const particles: FluidParticle[] = [];
     const count = Math.min(Math.floor((width * height) / 14000), 60);
 
-    // High-contrast palette: Vivid Crimson, Ruby, Obsidian, and Steel
-    const crimsonPalette = ['#dc2626', '#ef4444', '#b91c1c', '#0f172a', '#475569', '#dc2626'];
+    // High-contrast Dark Brutalist palette: Electric Crimson, Neon Ruby, Crisp White, and Zinc
+    const crimsonPalette = ['#ef4444', '#ff2a5f', '#ffffff', '#dc2626', '#f43f5e', '#71717a'];
 
     for (let i = 0; i < count; i++) {
       const x = Math.random() * width;
       const y = Math.random() * height;
-      const baseAlpha = Math.random() * 0.35 + 0.3; // High base visibility
+      const baseAlpha = Math.random() * 0.4 + 0.35; // High base visibility
       particles.push({
         x,
         y,
         originX: x,
         originY: y,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
         size: Math.random() * 2.5 + 1.8,
         color: crimsonPalette[Math.floor(Math.random() * crimsonPalette.length)],
         alpha: baseAlpha,
@@ -116,8 +116,8 @@ export const LiquidParticlesBackground: React.FC = () => {
           y: mouse.y,
           radius: 10,
           maxRadius: Math.min(120 + mouse.speed * 2.5, 240),
-          alpha: 0.45,
-          color: '220, 38, 38'
+          alpha: 0.5,
+          color: '239, 68, 68'
         });
       }
       mouse.speed *= 0.92;
@@ -144,10 +144,10 @@ export const LiquidParticlesBackground: React.FC = () => {
 
       // Render Ambient Crimson Glow behind mouse
       if (mouse.x > 0 && mouse.y > 0) {
-        const fluidGrad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 250);
-        fluidGrad.addColorStop(0, 'rgba(220, 38, 38, 0.08)');
-        fluidGrad.addColorStop(0.5, 'rgba(239, 68, 68, 0.03)');
-        fluidGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        const fluidGrad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 280);
+        fluidGrad.addColorStop(0, 'rgba(239, 68, 68, 0.12)');
+        fluidGrad.addColorStop(0.5, 'rgba(220, 38, 38, 0.04)');
+        fluidGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
         ctx.fillStyle = fluidGrad;
         ctx.fillRect(0, 0, width, height);
       }
@@ -198,8 +198,8 @@ export const LiquidParticlesBackground: React.FC = () => {
             ctx.save();
             const linkAlpha = (1 - distNodes / 130) * 0.22;
             ctx.globalAlpha = linkAlpha;
-            ctx.strokeStyle = '#dc2626';
-            ctx.lineWidth = 1.0;
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 1.2;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
