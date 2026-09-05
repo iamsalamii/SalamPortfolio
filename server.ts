@@ -358,29 +358,38 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
   session.expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes validity
 
   // Configure nodemailer transporter
-  let transporter: nodemailer.Transporter;
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587,
-      secure: process.env.SMTP_SECURE === "true",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
-    });
-  } else {
-    transporter = nodemailer.createTransport({
-      streamTransport: true,
-      newline: "windows"
-    });
+  let transporter: nodemailer.Transporter | null = null;
+  let emailDeliverySuccess = false;
+  let emailDeliveryError: string | null = null;
+
+  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    const cleanPass = process.env.SMTP_PASS.replace(/\s+/g, "");
+    if (process.env.SMTP_SERVICE === "gmail" || (process.env.SMTP_HOST && process.env.SMTP_HOST.includes("gmail"))) {
+      transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: cleanPass
+        }
+      });
+    } else if (process.env.SMTP_HOST) {
+      transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587,
+        secure: process.env.SMTP_SECURE === "true",
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: cleanPass
+        }
+      });
+    }
   }
 
   // Attempt email transmission
-  try {
-    if (process.env.SMTP_HOST) {
-      await transporter.sendMail({
-        from: `"SALAM.DEV Security Console" <${process.env.SMTP_FROM || ADMIN_EMAIL}>`,
+  if (transporter) {
+    try {
+      const mailInfo = await transporter.sendMail({
+        from: `"SALAM.DEV Security Console" <${process.env.SMTP_FROM || process.env.SMTP_USER || ADMIN_EMAIL}>`,
         to: cleanEmail,
         subject: `[SALAM.DEV] Votre Code de Sécurité 2FA : ${otpCode}`,
         text: `Bonjour Moussa Abdou Salam,\n\nVotre code d'authentification 2FA à usage unique est : ${otpCode}\n\nCe code est valable pendant 5 minutes.\n\n— Console de Sécurité SALAM.DEV`,
@@ -394,25 +403,28 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
           <p style="font-size:12px; color:#71717a;">Ce code expire dans 5 minutes. Ne le partagez avec personne.</p>
         </div>`
       });
+      emailDeliverySuccess = true;
+      console.log(`[SMTP SUCCESS] 2FA OTP Email delivered to ${cleanEmail}. Message ID: ${mailInfo.messageId}`);
+    } catch (mailErr: any) {
+      emailDeliveryError = mailErr?.message || "Erreur SMTP";
+      console.error("[SMTP ERROR] Failed to send email:", mailErr);
     }
-  } catch (mailErr) {
-    console.warn("SMTP email notification:", mailErr);
   }
 
   // Log securely to terminal
-  console.log(`\n======================================================\n[2FA OTP SECURITY DISPATCH]\nDESTINATION : ${cleanEmail}\nCODE OTP    : ${otpCode}\nVALIDITY    : 5 minutes\nSMTP STATUS : ${process.env.SMTP_HOST ? "CONNECTÉ (" + process.env.SMTP_HOST + ")" : "NON CONFIGURÉ (Mode Local)"}\n======================================================\n`);
+  console.log(`\n======================================================\n[2FA OTP SECURITY DISPATCH]\nDESTINATION : ${cleanEmail}\nCODE OTP    : ${otpCode}\nVALIDITY    : 5 minutes\nSMTP STATUS : ${emailDeliverySuccess ? "ENVOYÉ AVEC SUCCÈS VIA GMAIL" : transporter ? "ÉCHEC ENVOI (" + emailDeliveryError + ")" : "NON CONFIGURÉ (Mode Local)"}\n======================================================\n`);
 
-  addActivityLog(session.name, "OTP_DISPATCHED", "Security", `OTP code dispatched to personal address ${cleanEmail}`);
+  addActivityLog(session.name, "OTP_DISPATCHED", "Security", `OTP code dispatched to personal address ${cleanEmail} (SMTP: ${emailDeliverySuccess ? "OK" : "LOCAL/ERROR"})`);
 
-  const isSmtpConfigured = !!(process.env.SMTP_HOST && process.env.SMTP_USER);
+  const isSmtpConfigured = emailDeliverySuccess;
 
   return res.json({
     success: true,
     isSmtpConfigured,
-    message: isSmtpConfigured
-      ? `Code OTP expédié avec succès à votre adresse personnelle (${cleanEmail}). Consultez votre boîte de réception.`
-      : `Mode local actif : Votre serveur n'a pas encore de variables SMTP dans le fichier .env. Le code a été consigné dans la console terminal serveur.`,
-    devOtpCode: isSmtpConfigured ? undefined : otpCode
+    message: emailDeliverySuccess
+      ? `Code OTP expédié avec succès à votre adresse personnelle (${cleanEmail}). Consultez votre boîte de réception Gmail.`
+      : `Code OTP généré. ${emailDeliveryError ? "Erreur SMTP: " + emailDeliveryError : "Mode local actif : code consigné dans la console terminal serveur."}`,
+    devOtpCode: emailDeliverySuccess ? undefined : otpCode
   });
 });
 
