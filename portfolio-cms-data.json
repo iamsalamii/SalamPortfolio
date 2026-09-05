@@ -473,32 +473,7 @@
       "order": 3
     }
   ],
-  "certifications": [
-    {
-      "id": "cert-directsoft",
-      "name": "Attestation d'Ingénierie Full-Stack .NET & React",
-      "issuer": "GROUPE DIRECTSOFT",
-      "issueDate": "2024",
-      "logoUrl": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80",
-      "credentialUrl": "#",
-      "certificatePdfUrl": "#",
-      "description": "Validation de la maîtrise de l'architecture ASP.NET Core, Entity Framework Core, React et de la méthodologie Agile Scrum.",
-      "isActive": true,
-      "order": 1
-    },
-    {
-      "id": "cert-ida",
-      "name": "Brevet de Technicien Supérieur — Développeur d'Application",
-      "issuer": "Ministère de l'Enseignement Supérieur & CEFIAT",
-      "issueDate": "2023",
-      "logoUrl": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80",
-      "credentialUrl": "#",
-      "certificatePdfUrl": "#",
-      "description": "Validation officielle des compétences de concepteur et développeur d'applications logicielles.",
-      "isActive": true,
-      "order": 2
-    }
-  ],
+  "certifications": [],
   "services": [
     {
       "id": "srv-dotnet-api",
@@ -780,6 +755,22 @@
     }
   ],
   "activityLogs": [
+    {
+      "id": "log-1788572366437-wc7y",
+      "user": "Salam",
+      "action": "UPDATE",
+      "entityType": "Database",
+      "details": "Application content updated",
+      "timestamp": "2026-09-05T01:39:26.437Z"
+    },
+    {
+      "id": "log-1788572363469-dkuz",
+      "user": "Salam",
+      "action": "UPDATE",
+      "entityType": "Database",
+      "details": "Application content updated",
+      "timestamp": "2026-09-05T01:39:23.469Z"
+    },
     {
       "id": "log-init",
       "user": "system",

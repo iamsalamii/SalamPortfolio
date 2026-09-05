@@ -47,7 +47,17 @@ import { AdminActivityLogs } from './components/admin/AdminActivityLogs';
 
 const MainAppContent: React.FC = () => {
   const { data, currentView, selectedSlug, isAuthenticated, adminActiveTab } = useData();
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(() => {
+    if (typeof window !== 'undefined') {
+      // If currently on admin hash/route, never show landing page preloader
+      if (window.location.hash.startsWith('#admin') || window.location.pathname.startsWith('/admin')) {
+        return true;
+      }
+      // If preloader was already completed in this session, skip
+      return sessionStorage.getItem('portfolio_preloader_done') === 'true';
+    }
+    return false;
+  });
 
   // Dynamic Page Title & Meta Tags Synchronization
   useEffect(() => {
@@ -169,7 +179,18 @@ const MainAppContent: React.FC = () => {
 
   return (
     <>
-      {!hasLoaded && <PagePreloader onComplete={() => setHasLoaded(true)} />}
+      {!hasLoaded && currentView === 'portfolio' && (
+        <PagePreloader
+          onComplete={() => {
+            setHasLoaded(true);
+            try {
+              sessionStorage.setItem('portfolio_preloader_done', 'true');
+            } catch {
+              // ignore
+            }
+          }}
+        />
+      )}
       <div className="min-h-screen flex flex-col bg-white text-slate-950 relative overflow-x-hidden">
         <LiquidParticlesBackground />
         <Navbar />

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
-  const { data, setAdminActiveTab, navigateTo } = useData();
+  const { data, setAdminActiveTab, logout } = useData();
 
   const totalProjects = data.projects?.length || 0;
   const publishedProjects = (data.projects || []).filter(p => p.status === 'published').length;
@@ -105,11 +105,12 @@ export const AdminDashboard: React.FC = () => {
           </button>
           
           <button
-            onClick={() => navigateTo('portfolio')}
+            onClick={logout}
             className="px-5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs border border-slate-200 transition-all flex items-center gap-2 cursor-pointer"
+            title="Retourner au portfolio public et fermer la session"
           >
             <ExternalLink className="w-4 h-4" />
-            <span>Voir le site</span>
+            <span>Voir le site (Déconnexion)</span>
           </button>
         </div>
       </div>

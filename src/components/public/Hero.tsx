@@ -7,16 +7,15 @@ export const Hero: React.FC = () => {
   const info = data.personalInfo;
 
   return (
-    <section id="home" className="pt-36 pb-20 sm:pt-44 sm:pb-28 max-w-5xl mx-auto px-6 sm:px-8">
-      
-      <div className="space-y-8">
+    <section id="home" className="pt-36 pb-20 sm:pt-44 sm:pb-28 max-w-5xl mx-auto px-6 sm:px-8 relative">
+      <div className="space-y-8 max-w-3xl">
         
         {/* Availability / Location Tag */}
         <div className="flex items-center gap-3 text-xs font-mono text-slate-500">
           <span className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-red-600 inline-block animate-pulse" />
             <span className="text-slate-900 font-semibold">
-              {activeLanguage === 'fr' ? 'Disponible pour missions & opportunités' : 'Available for opportunities'}
+              {activeLanguage === 'fr' ? 'Disponible pour opportunités & missions' : 'Available for opportunities'}
             </span>
           </span>
           <span>•</span>
@@ -27,7 +26,7 @@ export const Hero: React.FC = () => {
         </div>
 
         {/* Big Editorial Headline with Crimson Accent */}
-        <div className="space-y-4 max-w-3xl">
+        <div className="space-y-4">
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-slate-950 tracking-tight leading-[1.08]">
             {activeLanguage === 'fr' ? (
               <>
@@ -42,8 +41,8 @@ export const Hero: React.FC = () => {
 
           <p className="text-lg sm:text-xl text-slate-600 leading-relaxed font-normal pt-2">
             {activeLanguage === 'fr' 
-              ? "Développeur chez GROUPE DIRECTSOFT avec +2 ans d'expérience. Je conçois des architectures logicielles modulaires en C#, ASP.NET Core, Entity Framework Core et des interfaces modernes en React."
-              : "Software Engineer at GROUPE DIRECTSOFT with +2 years of experience crafting scalable .NET Core backends, robust database architectures, and reactive React applications."}
+              ? (info?.bio?.fr || "Développeur chez GROUPE DIRECTSOFT avec +2 ans d'expérience. Je conçois des architectures logicielles modulaires en C#, ASP.NET Core, Entity Framework Core et des interfaces modernes en React.")
+              : (info?.bio?.en || "Software Engineer at GROUPE DIRECTSOFT with +2 years of experience crafting scalable .NET Core backends, robust database architectures, and reactive React applications.")}
           </p>
         </div>
 
@@ -58,7 +57,7 @@ export const Hero: React.FC = () => {
           </a>
 
           <a
-            href="/assets/CV_MOUSSA_ABDOU_SALAM.pdf"
+            href={info?.cvUrl || "/assets/CV_MOUSSA_ABDOU_SALAM.pdf"}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-900 text-sm font-medium transition-colors"
@@ -68,18 +67,18 @@ export const Hero: React.FC = () => {
           </a>
 
           <a
-            href="mailto:moussasalam86@gmail.com"
+            href={`mailto:${info?.email || 'moussasalam86@gmail.com'}`}
             className="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-slate-200 hover:border-slate-400 text-slate-700 text-sm font-medium transition-colors"
           >
             <Mail className="w-4 h-4 text-slate-400" />
-            <span>moussasalam86@gmail.com</span>
+            <span>{info?.email || 'moussasalam86@gmail.com'}</span>
           </a>
         </div>
 
         {/* Social Links Bar */}
         <div className="flex items-center gap-6 pt-4 text-xs font-mono text-slate-500">
           <a
-            href="https://linkedin.com/in/abdou-salam-moussa"
+            href={info?.linkedinUrl || "https://linkedin.com/in/abdou-salam-moussa"}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-red-600 transition-colors flex items-center gap-1.5"
@@ -88,7 +87,7 @@ export const Hero: React.FC = () => {
             <span>LinkedIn</span>
           </a>
           <a
-            href="https://github.com"
+            href={info?.githubUrl || "https://github.com"}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-red-600 transition-colors flex items-center gap-1.5"
@@ -101,7 +100,6 @@ export const Hero: React.FC = () => {
         </div>
 
       </div>
-
     </section>
   );
 };

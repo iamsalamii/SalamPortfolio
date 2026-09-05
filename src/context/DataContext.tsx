@@ -5,6 +5,7 @@ import { initialSeedData } from '../data/seedData';
 interface DataContextType {
   data: AppData;
   isLoading: boolean;
+  isSaving: boolean;
   activeLanguage: string;
   setActiveLanguage: (code: string) => void;
   themeMode: ThemeMode;
@@ -34,8 +35,18 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'salam_dotnet_portfolio_v3';
 const AUTH_STORAGE_KEY = 'salam_admin_user_v3';
+const TOKEN_STORAGE_KEY = 'salam_auth_token_v3';
 const LANG_STORAGE_KEY = 'salam_active_lang_v3';
 const THEME_STORAGE_KEY = 'salam_theme_mode_v3';
+
+const getAuthHeaders = (): Record<string, string> => {
+  const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+};
 
 const sanitizeAppData = (loadedData: AppData): AppData => {
   if (!loadedData || !loadedData.personalInfo) return initialSeedData;
@@ -59,6 +70,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [activeLanguage, setActiveLanguageState] = useState<string>(() => {
     return localStorage.getItem(LANG_STORAGE_KEY) || 'fr';
   });
@@ -107,7 +119,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchApiData();
   }, []);
 
-  // Handle URL hash / routing synchronization - defaults strictly to public portfolio on initial load
+  // Handle URL hash / routing synchronization - defaults to public developer portfolio
   useEffect(() => {
     const handleLocation = () => {
       const path = window.location.pathname;
@@ -120,27 +132,30 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (tabMatch && tabMatch[1]) {
           setAdminActiveTab(tabMatch[1]);
         }
-      } else if (path.startsWith('/projects/') || hash.startsWith('#project/')) {
-        const slug = path.startsWith('/projects/') ? path.replace('/projects/', '') : hash.replace('#project/', '');
-        setSelectedSlug(slug);
-        setCurrentView('project-detail');
       } else {
-        // Default unconditionally to public portfolio
-        setCurrentView('portfolio');
+        // Leaving admin to public portfolio -> immediate auto logout
+        const currentToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+        if (currentToken) {
+          setCurrentUser(null);
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+          localStorage.removeItem(TOKEN_STORAGE_KEY);
+        }
+
+        if (path.startsWith('/projects/') || hash.startsWith('#project/')) {
+          const slug = path.startsWith('/projects/') ? path.replace('/projects/', '') : hash.replace('#project/', '');
+          setSelectedSlug(slug);
+          setCurrentView('project-detail');
+        } else if (path.startsWith('/blog/') || hash.startsWith('#blog/')) {
+          const slug = path.startsWith('/blog/') ? path.replace('/blog/', '') : hash.replace('#blog/', '');
+          setSelectedSlug(slug);
+          setCurrentView('blog-detail');
+        } else {
+          setCurrentView('portfolio');
+        }
       }
     };
 
-    // On initial mount, if hash is just '#admin' from a past session, clean it to land directly on portfolio
-    if (window.location.hash === '#admin') {
-      try {
-        history.replaceState(null, '', window.location.pathname);
-      } catch {
-        window.location.hash = '';
-      }
-      setCurrentView('portfolio');
-    } else {
-      handleLocation();
-    }
+    handleLocation();
 
     window.addEventListener('popstate', handleLocation);
     window.addEventListener('hashchange', handleLocation);
@@ -168,6 +183,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const navigateTo = useCallback((view: 'portfolio' | 'project-detail' | 'blog-detail' | 'admin', slug?: string) => {
+    // If leaving admin space to return to public portfolio, immediately log out
+    if (currentView === 'admin' && view === 'portfolio') {
+      setCurrentUser(null);
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+    }
+
     setCurrentView(view);
     if (slug) setSelectedSlug(slug);
 
@@ -181,7 +203,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       window.location.hash = '';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, []);
+  }, [currentView]);
 
   const t = useCallback((key: string, defaultText?: string): string => {
     const langDict = data.translations?.[activeLanguage] || data.translations?.['en'] || {};
@@ -192,6 +214,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [data.translations, activeLanguage]);
 
   const updateData = async (newData: Partial<AppData>) => {
+    setIsSaving(true);
     const merged: AppData = { ...data, ...newData };
     setData(merged);
     try {
@@ -203,15 +226,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await fetch('/api/data', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(merged)
       });
     } catch (err) {
       console.warn('Could not sync to backend API:', err);
+    } finally {
+      setTimeout(() => setIsSaving(false), 300);
     }
   };
 
   const updateModule = async <K extends keyof AppData>(moduleKey: K, payload: AppData[K]) => {
+    setIsSaving(true);
     const merged: AppData = { ...data, [moduleKey]: payload };
     setData(merged);
     try {
@@ -223,15 +249,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await fetch(`/api/module/${String(moduleKey)}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(payload)
       });
     } catch (err) {
       console.warn(`Could not sync module ${String(moduleKey)}:`, err);
+    } finally {
+      setTimeout(() => setIsSaving(false), 300);
     }
   };
 
   const resetToSeed = async () => {
+    setIsSaving(true);
     const freshSeed = JSON.parse(JSON.stringify(initialSeedData));
     setData(freshSeed);
     try {
@@ -240,13 +269,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // ignore
     }
     try {
-      await fetch('/api/data/reset-seed', { method: 'POST' });
+      await fetch('/api/data/reset-seed', {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
     } catch (err) {
       console.warn('API reset failed:', err);
+    } finally {
+      setTimeout(() => setIsSaving(false), 300);
     }
   };
 
   const clearAllData = async () => {
+    setIsSaving(true);
     const cleared: AppData = {
       ...data,
       projects: [],
@@ -267,9 +302,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // ignore
     }
     try {
-      await fetch('/api/data/clear', { method: 'POST' });
+      await fetch('/api/data/clear', {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
     } catch (err) {
       console.warn('API clear failed:', err);
+    } finally {
+      setTimeout(() => setIsSaving(false), 300);
     }
   };
 
@@ -309,45 +349,35 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Secure Server-Only Authentication (Zero hardcoded credentials on client)
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username: username.trim(), password: password.trim() })
       });
+
       if (res.ok) {
         const resData = await res.json();
-        setCurrentUser(resData.user);
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(resData.user));
-        return true;
+        if (resData.user && resData.token) {
+          setCurrentUser(resData.user);
+          localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(resData.user));
+          localStorage.setItem(TOKEN_STORAGE_KEY, resData.token);
+          return true;
+        }
       }
-    } catch {
-      // local fallback
+      return false;
+    } catch (err) {
+      console.error('Erreur lors de la tentative de connexion:', err);
+      return false;
     }
-
-    // Client fallback validation (strictly salam@portfolios.com and Adm!n123@)
-    const cleanU = username.trim().toLowerCase();
-    const cleanP = password.trim();
-    if (cleanU === 'salam@portfolios.com' && cleanP === 'Adm!n123@') {
-      const localUser: AdminUser = {
-        id: 'usr-salam',
-        username: 'salam@portfolios.com',
-        name: 'Moussa Abdou Salam',
-        email: 'salam@portfolios.com',
-        role: 'Super Admin',
-        avatarUrl: '/assets/maphotops600.jpg'
-      };
-      setCurrentUser(localUser);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(localUser));
-      return true;
-    }
-    return false;
   };
 
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
     navigateTo('portfolio');
   };
 
@@ -356,6 +386,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         data,
         isLoading,
+        isSaving,
         activeLanguage,
         setActiveLanguage,
         themeMode,

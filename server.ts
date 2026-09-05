@@ -16,9 +16,7 @@ const IS_PROD = process.env.NODE_ENV === "production";
 const JWT_SECRET = process.env.JWT_SECRET || "salam_portfolio_secure_jwt_secret_2026_x9k2m";
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "salam@portfolios.com").trim().toLowerCase();
 
-// Pre-computed salted bcrypt hash for 'Adm!n123@' (Salt rounds 10)
-const DEFAULT_ADMIN_HASH = "$2a$10$fWv0aC1lK8QyXhS1Zf8c7.N5e7c8v4b9d0e1f2g3h4i5j6k7l8m9n"; // generated
-let ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync("Adm!n123@", 10);
+let ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync(process.env.ADMIN_DEFAULT_PASSWORD || "Adm!n123@", 10);
 
 // ---------------- 1. SECURITY HEADERS & CORS ----------------
 app.use((req: Request, res: Response, next: NextFunction) => {
