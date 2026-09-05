@@ -3,12 +3,11 @@
     "firstName": "Moussa Abdou",
     "lastName": "Salam",
     "title": "Développeur Full Stack .NET (C#, .NET, React)",
-    "headline": "Développeur Full Stack .NET / React au sein du GROUPE DIRECTSOFT, concevant des architectures logicielles robustes, modulaires et performantes.",
-    "bioShort": "Passionné par le développement d’applications web robustes, je suis actuellement développeur au sein du GROUPE DIRECTSOFT sur des solutions fullstack .NET/React en méthode agile Scrum.",
+    "headline": "Je crée des solutions digitales qui transforment les idées des entreprises en réalité.",
+    "bioShort": "Je transforme vos idées en solutions digitales modernes, performantes et adaptées à vos besoins. Je conçois des applications web sur mesure qui allient simplicité, efficacité et expérience utilisateur.\n\nAvec une expérience en développement .NET et web, j’accompagne les entreprises dans la conception et la réalisation de leurs projets, de l’idée à la mise en production. Ma philosophie est simple : comprendre votre besoin, proposer une solution pertinente et construire un produit fiable, évolutif et réellement utile à votre activité.",
     "bioLong": [
-      "Passionné par le développement d’applications web robustes, je suis actuellement développeur au sein du GROUPE DIRECTSOFT sur des solutions fullstack .NET/React.",
-      "À l’aise en méthode agile Scrum, je conçois des architectures logicielles maintenables appliquant les principes SOLID, l'injection de dépendances (ASP.NET Core) et les tests automatisés (xUnit, SpecFlow).",
-      "Mon expertise couvre le backend (C#, ASP.NET Core, Entity Framework Core, SQL Server, PostgreSQL) ainsi que le frontend moderne (React, TypeScript, Tailwind CSS, Razor Pages)."
+      "Chaque projet commence par une compréhension claire de vos besoins et de vos objectifs. Je privilégie une approche simple, transparente et orientée résultats afin de créer des solutions réellement utiles à votre activité.",
+      "Mon objectif ne se limite pas à développer une application : je cherche à concevoir une solution fiable, intuitive et évolutive, pensée pour vous faire gagner du temps, améliorer votre organisation et accompagner la croissance de votre entreprise."
     ],
     "location": "Abidjan, Côte d'Ivoire",
     "email": "moussasalam86@gmail.com",
@@ -634,7 +633,7 @@
       "isActive": true,
       "openInNewTab": false,
       "sectionId": "experience",
-      "isVisible": true
+      "isVisible": false
     },
     {
       "id": "nav-education",
@@ -810,7 +809,7 @@
     "ogTitle": "Moussa Abdou Salam — Développeur Full Stack .NET",
     "ogDescription": "Développeur Full Stack .NET / React concevant des architectures logicielles robustes et performantes.",
     "ogImage": "/assets/maphotops600.jpg",
-    "canonicalUrl": "https://salam.dev",
+    "canonicalUrl": "https://salamdev.com",
     "robotsPolicy": "index, follow"
   },
   "users": [
@@ -824,6 +823,86 @@
     }
   ],
   "activityLogs": [
+    {
+      "id": "log-1788638907498-9b6a",
+      "user": "Salam",
+      "action": "UPDATE",
+      "entityType": "Database",
+      "details": "Application content updated",
+      "timestamp": "2026-09-05T20:08:27.498Z"
+    },
+    {
+      "id": "log-1788638781899-c01n",
+      "user": "Salam",
+      "action": "UPDATE",
+      "entityType": "personalInfo",
+      "details": "Updated personalInfo configuration",
+      "timestamp": "2026-09-05T20:06:21.899Z"
+    },
+    {
+      "id": "log-1788636756453-l1c3",
+      "user": "Moussa Abdou Salam",
+      "action": "LOGIN_SUCCESS",
+      "entityType": "Security",
+      "details": "Administrator authenticated with 2FA OTP",
+      "timestamp": "2026-09-05T19:32:36.453Z"
+    },
+    {
+      "id": "log-1788636737674-cb0w",
+      "user": "Moussa Abdou Salam",
+      "action": "OTP_DISPATCHED",
+      "entityType": "Security",
+      "details": "OTP code dispatched to personal address moussasalam86@gmail.com (SMTP: OK)",
+      "timestamp": "2026-09-05T19:32:17.674Z"
+    },
+    {
+      "id": "log-1788636721397-quac",
+      "user": "Moussa Abdou Salam",
+      "action": "OTP_CHALLENGE",
+      "entityType": "Security",
+      "details": "OTP challenge initiated for admin session",
+      "timestamp": "2026-09-05T19:32:01.397Z"
+    },
+    {
+      "id": "log-1788636644802-gi1e",
+      "user": "Moussa Abdou Salam",
+      "action": "LOGIN_SUCCESS",
+      "entityType": "Security",
+      "details": "Administrator authenticated with 2FA OTP",
+      "timestamp": "2026-09-05T19:30:44.802Z"
+    },
+    {
+      "id": "log-1788636622414-wrmy",
+      "user": "Moussa Abdou Salam",
+      "action": "OTP_DISPATCHED",
+      "entityType": "Security",
+      "details": "OTP code dispatched to personal address moussasalam86@gmail.com (SMTP: OK)",
+      "timestamp": "2026-09-05T19:30:22.414Z"
+    },
+    {
+      "id": "log-1788636617165-dngz",
+      "user": "Moussa Abdou Salam",
+      "action": "OTP_CHALLENGE",
+      "entityType": "Security",
+      "details": "OTP challenge initiated for admin session",
+      "timestamp": "2026-09-05T19:30:17.165Z"
+    },
+    {
+      "id": "log-1788636495056-156b",
+      "user": "Moussa Abdou Salam",
+      "action": "OTP_DISPATCHED",
+      "entityType": "Security",
+      "details": "OTP code dispatched to personal address moussasalam86@gmail.com (SMTP: OK)",
+      "timestamp": "2026-09-05T19:28:15.056Z"
+    },
+    {
+      "id": "log-1788636492424-btgr",
+      "user": "Moussa Abdou Salam",
+      "action": "OTP_CHALLENGE",
+      "entityType": "Security",
+      "details": "OTP challenge initiated for admin session",
+      "timestamp": "2026-09-05T19:28:12.424Z"
+    },
     {
       "id": "log-1788618083184-9lmk",
       "user": "Salam",

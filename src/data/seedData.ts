@@ -17,6 +17,9 @@ export const initialSeedData: AppData = {
     phone: "+225 07 09 83 74 55",
     avatarUrl: "/assets/maphotops600.jpg",
     heroBackgroundUrl: "",
+    linkedinUrl: "https://linkedin.com/in/abdou-salam-moussa",
+    githubUrl: "https://github.com",
+    whatsappUrl: "https://wa.me/2250709837455",
     availabilityStatus: "available",
     availabilityText: "Disponible pour Missions & Opportunités (2026)",
     yearsOfExperience: 2,
@@ -33,6 +36,12 @@ export const initialSeedData: AppData = {
       { title: "Backend", description: "C#, ASP.NET Core, EF Core, SQL Server" },
       { title: "Frontend", description: "React, TypeScript, Tailwind CSS, Flutter" },
       { title: "Méthodologie", description: "Agilité SCRUM, TDD, Git Flow" }
+    ],
+    heroStats: [
+      { id: "stat-1", indexLabel: "01 // EXP", value: "+2 ANS", subtitle: "DIRECTSOFT INGÉNIERIE", icon: "terminal" },
+      { id: "stat-2", indexLabel: "02 // STACK", value: ".NET 9", subtitle: "C# & ASP.NET CORE", icon: "code" },
+      { id: "stat-3", indexLabel: "03 // DATA", value: "SQL + PG", subtitle: "EF CORE & SCHEMAS", icon: "database" },
+      { id: "stat-4", indexLabel: "04 // FRONT", value: "REACT+TS", subtitle: "MODERN UI CLIENT", icon: "layers" }
     ],
     cvList: [
       {

@@ -9,6 +9,14 @@ export interface CvItem {
   isDefault: boolean;
 }
 
+export interface HeroStatCard {
+  id: string;
+  indexLabel: string; // e.g. "01 // EXP"
+  value: string;      // e.g. "+2 ANS"
+  subtitle: string;   // e.g. "DIRECTSOFT INGÉNIERIE" or customized company/stack
+  icon?: 'terminal' | 'code' | 'database' | 'layers' | 'sparkles';
+}
+
 export interface PersonalInfo {
   firstName: string;
   lastName: string;
@@ -21,11 +29,16 @@ export interface PersonalInfo {
   phone: string;
   avatarUrl: string;
   heroBackgroundUrl?: string;
+  linkedinUrl?: string;
+  githubUrl?: string;
+  whatsappUrl?: string;
+  twitterUrl?: string;
   availabilityStatus: AvailabilityStatus;
   availabilityText: string;
   yearsOfExperience: number;
   specialties: string[];
   principles?: { title: string; description: string }[];
+  heroStats?: HeroStatCard[];
   cvList: CvItem[];
 }
 

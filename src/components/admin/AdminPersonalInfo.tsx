@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../../context/DataContext';
-import { PersonalInfo, CvItem } from '../../types';
+import { PersonalInfo, CvItem, HeroStatCard } from '../../types';
 import { 
   Save, 
   User, 
@@ -11,13 +11,37 @@ import {
   Sparkles, 
   Layers, 
   BookOpen,
-  FileText
+  FileText,
+  Linkedin,
+  Github,
+  Phone,
+  Mail,
+  MapPin,
+  Terminal,
+  Code2,
+  Database,
+  BarChart3,
+  Share2
 } from 'lucide-react';
 
 export const AdminPersonalInfo: React.FC = () => {
   const { data, updateModule } = useData();
+  
+  const defaultHeroStats: HeroStatCard[] = [
+    { id: 'stat-1', indexLabel: '01 // EXP', value: '+2 ANS', subtitle: 'DIRECTSOFT INGÉNIERIE', icon: 'terminal' },
+    { id: 'stat-2', indexLabel: '02 // STACK', value: '.NET 9', subtitle: 'C# & ASP.NET CORE', icon: 'code' },
+    { id: 'stat-3', indexLabel: '03 // DATA', value: 'SQL + PG', subtitle: 'EF CORE & SCHEMAS', icon: 'database' },
+    { id: 'stat-4', indexLabel: '04 // FRONT', value: 'REACT+TS', subtitle: 'MODERN UI CLIENT', icon: 'layers' }
+  ];
+
   const [info, setInfo] = useState<PersonalInfo>({ 
     ...data.personalInfo,
+    linkedinUrl: data.personalInfo.linkedinUrl || "https://linkedin.com/in/abdou-salam-moussa",
+    githubUrl: data.personalInfo.githubUrl || "https://github.com",
+    whatsappUrl: data.personalInfo.whatsappUrl || "https://wa.me/2250709837455",
+    heroStats: (data.personalInfo.heroStats && data.personalInfo.heroStats.length > 0) 
+      ? data.personalInfo.heroStats 
+      : defaultHeroStats,
     principles: data.personalInfo.principles || [
       { title: "Architecture", description: "Clean Architecture, SOLID, Design Patterns" },
       { title: "Backend", description: "C#, ASP.NET Core, EF Core, SQL Server" },
@@ -53,6 +77,34 @@ export const AdminPersonalInfo: React.FC = () => {
     const next = [...(info.specialties || [])];
     next.splice(idx, 1);
     setInfo({ ...info, specialties: next });
+  };
+
+  // Hero Stats Management
+  const addHeroStat = () => {
+    const nextIdx = (info.heroStats || []).length + 1;
+    const newStat: HeroStatCard = {
+      id: `stat-${Date.now()}`,
+      indexLabel: `0${nextIdx} // FOCUS`,
+      value: 'NOUVEAU',
+      subtitle: 'SOUS-TITRE / FOCUS',
+      icon: 'terminal'
+    };
+    setInfo({
+      ...info,
+      heroStats: [...(info.heroStats || []), newStat]
+    });
+  };
+
+  const updateHeroStat = (index: number, field: keyof HeroStatCard, val: any) => {
+    const next = [...(info.heroStats || [])];
+    next[index] = { ...next[index], [field]: val };
+    setInfo({ ...info, heroStats: next });
+  };
+
+  const removeHeroStat = (index: number) => {
+    const next = [...(info.heroStats || [])];
+    next.splice(index, 1);
+    setInfo({ ...info, heroStats: next });
   };
 
   // Principles management
@@ -114,10 +166,10 @@ export const AdminPersonalInfo: React.FC = () => {
         <div>
           <h2 className="text-xl font-extrabold text-slate-950 flex items-center gap-2">
             <User className="w-5 h-5 text-red-600" />
-            <span>Profil, Photo &amp; Philosophie (Démarche)</span>
+            <span>Profil, Réseaux Sociaux &amp; Hero Paramétrable</span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Gérez votre photo, biographie, démarche technique, coordonnées et principes d'ingénierie.
+            Gérez vos informations personnelles, liens de réseaux sociaux (LinkedIn, GitHub, WhatsApp), cartes statistiques et démarche technique.
           </p>
         </div>
 
@@ -133,7 +185,7 @@ export const AdminPersonalInfo: React.FC = () => {
       {savedSuccess && (
         <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 font-medium">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>Profil, photo et philosophie mis à jour avec succès en base de données !</span>
+          <span>Toutes vos modifications de profil et du Hero ont été enregistrées avec succès !</span>
         </div>
       )}
 
@@ -199,36 +251,38 @@ export const AdminPersonalInfo: React.FC = () => {
                 </label>
               </div>
               <p className="text-[11px] text-slate-500">
-                Vous pouvez saisir un chemin local (ex: <code className="text-red-600 font-bold">/assets/maphotops600.jpg</code>), une URL HTTPS ou importer directement un fichier image depuis votre ordinateur.
+                Vous pouvez saisir un chemin local (ex: <code className="text-red-600 font-bold">/assets/maphotops600.jpg</code>), une URL HTTPS ou importer directement un fichier image.
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Basic Names & Professional Title */}
+      {/* 2. Basic Names, Hero Headline & Professional Title */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-5">
         <h3 className="text-xs font-mono font-bold uppercase text-red-600 tracking-wider flex items-center gap-2">
           <User className="w-4 h-4" />
-          <span>Identité &amp; Titre Principal</span>
+          <span>Identité &amp; Titres du Hero (Accueil)</span>
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Prénom</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Prénom (Ligne 1 Grand Titre Hero)</label>
             <input
               type="text"
               value={info.firstName}
               onChange={(e) => setInfo({ ...info, firstName: e.target.value })}
+              placeholder="MOUSSA ABDOU"
               className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white transition-colors"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Nom</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Nom (Ligne 2 Grand Titre Hero dégradé rouge)</label>
             <input
               type="text"
               value={info.lastName}
               onChange={(e) => setInfo({ ...info, lastName: e.target.value })}
+              placeholder="SALAM"
               className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white transition-colors"
             />
           </div>
@@ -236,22 +290,95 @@ export const AdminPersonalInfo: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Titre Professionnel</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Titre Professionnel / Poste (ex: FULL STACK .NET 9 &amp; REACT ENGINEER)
+            </label>
             <input
               type="text"
               value={info.title}
               onChange={(e) => setInfo({ ...info, title: e.target.value })}
-              placeholder="ex: Développeur Full Stack .NET"
+              placeholder="FULL STACK .NET 9 & REACT ENGINEER"
               className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Accroche / Headline</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Badge de Disponibilité (Ruban supérieur)
+            </label>
             <input
               type="text"
-              value={info.headline}
-              onChange={(e) => setInfo({ ...info, headline: e.target.value })}
+              value={info.availabilityText}
+              onChange={(e) => setInfo({ ...info, availabilityText: e.target.value })}
+              placeholder="DISPONIBLE // MISSIONS & CDI"
+              className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white transition-colors"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Texte d'Accroche / Description du Hero (Sous le Titre)
+          </label>
+          <textarea
+            rows={3}
+            value={info.headline}
+            onChange={(e) => setInfo({ ...info, headline: e.target.value })}
+            placeholder="Développeur au sein du GROUPE DIRECTSOFT (+2 ans). Spécialiste de la conception d'architectures logicielles scalables en C#, ASP.NET Core, EF Core, SQL Server / PostgreSQL..."
+            className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white transition-colors resize-none leading-relaxed"
+          />
+          <p className="text-[11px] text-slate-500 mt-1">
+            Ce texte est 100% modifiable. Si vous changez d'entreprise ou de statut, mettez simplement à jour cette phrase.
+          </p>
+        </div>
+      </div>
+
+      {/* 3. Réseaux Sociaux & Coordonnées Publiques */}
+      <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-5">
+        <h3 className="text-xs font-mono font-bold uppercase text-red-600 tracking-wider flex items-center gap-2">
+          <Share2 className="w-4 h-4" />
+          <span>Réseaux Sociaux &amp; Contact Public (Boutons Hero &amp; Footer)</span>
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+              <Linkedin className="w-3.5 h-3.5 text-[#0a66c2]" />
+              <span>URL Profil LinkedIn</span>
+            </label>
+            <input
+              type="url"
+              value={info.linkedinUrl || ''}
+              onChange={(e) => setInfo({ ...info, linkedinUrl: e.target.value })}
+              placeholder="https://linkedin.com/in/abdou-salam-moussa"
+              className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+              <Github className="w-3.5 h-3.5 text-slate-900" />
+              <span>URL Profil GitHub</span>
+            </label>
+            <input
+              type="url"
+              value={info.githubUrl || ''}
+              onChange={(e) => setInfo({ ...info, githubUrl: e.target.value })}
+              placeholder="https://github.com/votre-compte"
+              className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+              <Phone className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Lien WhatsApp / Numéro</span>
+            </label>
+            <input
+              type="text"
+              value={info.whatsappUrl || ''}
+              onChange={(e) => setInfo({ ...info, whatsappUrl: e.target.value })}
+              placeholder="https://wa.me/2250709837455"
               className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white transition-colors"
             />
           </div>
@@ -259,36 +386,146 @@ export const AdminPersonalInfo: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Email de contact</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+              <Mail className="w-3.5 h-3.5 text-red-600" />
+              <span>Email de Contact Public</span>
+            </label>
             <input
               type="email"
               value={info.email}
               onChange={(e) => setInfo({ ...info, email: e.target.value })}
+              placeholder="moussasalam86@gmail.com"
               className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white transition-colors"
             />
           </div>
+
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Téléphone / WhatsApp</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+              <Phone className="w-3.5 h-3.5 text-slate-600" />
+              <span>Numéro de Téléphone</span>
+            </label>
             <input
               type="text"
               value={info.phone}
               onChange={(e) => setInfo({ ...info, phone: e.target.value })}
+              placeholder="+225 07 09 83 74 55"
               className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white transition-colors"
             />
           </div>
+
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Localisation</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-red-600" />
+              <span>Localisation</span>
+            </label>
             <input
               type="text"
               value={info.location}
               onChange={(e) => setInfo({ ...info, location: e.target.value })}
+              placeholder="Abidjan, Côte d'Ivoire"
               className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 focus:bg-white transition-colors"
             />
           </div>
         </div>
       </div>
 
-      {/* 3. Section "Profil & Démarche" */}
+      {/* 4. Cartes Statistiques & Points Forts du Hero (Paramétrables) */}
+      <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xs font-mono font-bold uppercase text-red-600 tracking-wider flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              <span>Cartes Statistiques &amp; Points Forts du Hero (Grille 4 Cartes)</span>
+            </h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Les 4 blocs affichés en bas de la section Hero (ex: +2 ANS / DIRECTSOFT, .NET 9, SQL + PG, REACT+TS). Modifiez-les librement à tout moment.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={addHeroStat}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold border border-red-200 transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Ajouter une Carte</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {(info.heroStats || []).map((stat, idx) => (
+            <div key={stat.id || idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 relative group">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold text-red-600 uppercase">
+                  Carte #{idx + 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeHeroStat(idx)}
+                  className="text-slate-400 hover:text-red-600 transition-colors"
+                  title="Supprimer cette carte"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-700 mb-1">Index / Tag</label>
+                  <input
+                    type="text"
+                    value={stat.indexLabel}
+                    onChange={(e) => updateHeroStat(idx, 'indexLabel', e.target.value)}
+                    placeholder="01 // EXP"
+                    className="w-full px-3 py-1.5 text-xs rounded-xl bg-white border border-slate-300 text-slate-900 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-700 mb-1">Icône</label>
+                  <select
+                    value={stat.icon || 'terminal'}
+                    onChange={(e) => updateHeroStat(idx, 'icon', e.target.value)}
+                    className="w-full px-3 py-1.5 text-xs rounded-xl bg-white border border-slate-300 text-slate-900"
+                  >
+                    <option value="terminal">Terminal</option>
+                    <option value="code">Code</option>
+                    <option value="database">Database</option>
+                    <option value="layers">Layers (Front)</option>
+                    <option value="sparkles">Sparkles</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-700 mb-1">Valeur Principale (Gros Titre)</label>
+                  <input
+                    type="text"
+                    value={stat.value}
+                    onChange={(e) => updateHeroStat(idx, 'value', e.target.value)}
+                    placeholder="+2 ANS ou .NET 9"
+                    className="w-full px-3 py-1.5 text-xs rounded-xl bg-white border border-slate-300 text-slate-900 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-700 mb-1">Sous-titre / Entreprise / Focus</label>
+                  <input
+                    type="text"
+                    value={stat.subtitle}
+                    onChange={(e) => updateHeroStat(idx, 'subtitle', e.target.value)}
+                    placeholder="DIRECTSOFT INGÉNIERIE ou C# & ASP.NET CORE"
+                    className="w-full px-3 py-1.5 text-xs rounded-xl bg-white border border-slate-300 text-slate-900 font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 5. Section "Profil & Démarche" */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-5">
         <h3 className="text-xs font-mono font-bold uppercase text-red-600 tracking-wider flex items-center gap-2">
           <BookOpen className="w-4 h-4" />
@@ -297,7 +534,7 @@ export const AdminPersonalInfo: React.FC = () => {
 
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-            Paragraphe 1 : Accroche Principale (Introduction)
+            Paragraphe 1 : Accroche Principale (Introduction de votre démarche)
           </label>
           <textarea
             rows={3}
@@ -310,7 +547,7 @@ export const AdminPersonalInfo: React.FC = () => {
 
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-            Paragraphe 2 : Philosophie &amp; Expérience chez GROUPE DIRECTSOFT
+            Paragraphe 2 : Philosophie &amp; Expérience
           </label>
           <textarea
             rows={4}
@@ -322,13 +559,13 @@ export const AdminPersonalInfo: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. Piliers & Principes Logicielles */}
+      {/* 6. Piliers & Principes Logiciels */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-5">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xs font-mono font-bold uppercase text-red-600 tracking-wider flex items-center gap-2">
               <Layers className="w-4 h-4" />
-              <span>Piliers d'Ingénierie &amp; Principes Logicielles</span>
+              <span>Piliers d'Ingénierie &amp; Principes Logiciels</span>
             </h3>
             <p className="text-xs text-slate-500 mt-1">
               Les cartes affichées dans la section Profil &amp; Démarche (ex: Architecture, Backend, Frontend, Méthodologie).
@@ -386,7 +623,7 @@ export const AdminPersonalInfo: React.FC = () => {
         </div>
       </div>
 
-      {/* 5. Core Specialties */}
+      {/* 7. Core Specialties */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-4">
         <h3 className="text-xs font-mono font-bold uppercase text-red-600 tracking-wider flex items-center gap-2">
           <Sparkles className="w-4 h-4" />
@@ -435,7 +672,7 @@ export const AdminPersonalInfo: React.FC = () => {
         </div>
       </div>
 
-      {/* 6. CV Downloads */}
+      {/* 8. CV Downloads */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div>

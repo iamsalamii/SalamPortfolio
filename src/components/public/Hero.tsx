@@ -1,10 +1,36 @@
 import React from 'react';
 import { useData } from '../../context/DataContext';
-import { ArrowUpRight, Download, Mail, Github, Linkedin, MapPin, Terminal, Code2, Database, Layers } from 'lucide-react';
+import { ArrowUpRight, Download, Mail, Github, Linkedin, MapPin, Terminal, Code2, Database, Layers, Sparkles } from 'lucide-react';
+import { HeroStatCard } from '../../types';
 
 export const Hero: React.FC = () => {
   const { data, activeLanguage } = useData();
   const info = data.personalInfo;
+
+  const defaultStats: HeroStatCard[] = [
+    { id: 'stat-1', indexLabel: '01 // EXP', value: '+2 ANS', subtitle: 'DIRECTSOFT INGÉNIERIE', icon: 'terminal' },
+    { id: 'stat-2', indexLabel: '02 // STACK', value: '.NET 9', subtitle: 'C# & ASP.NET CORE', icon: 'code' },
+    { id: 'stat-3', indexLabel: '03 // DATA', value: 'SQL + PG', subtitle: 'EF CORE & SCHEMAS', icon: 'database' },
+    { id: 'stat-4', indexLabel: '04 // FRONT', value: 'REACT+TS', subtitle: 'MODERN UI CLIENT', icon: 'layers' }
+  ];
+
+  const statsList: HeroStatCard[] = (info?.heroStats && info.heroStats.length > 0) ? info.heroStats : defaultStats;
+
+  const getStatIcon = (iconName?: string) => {
+    switch (iconName) {
+      case 'code':
+        return <Code2 className="w-3.5 h-3.5 text-red-500" />;
+      case 'database':
+        return <Database className="w-3.5 h-3.5 text-red-500" />;
+      case 'layers':
+        return <Layers className="w-3.5 h-3.5 text-red-500" />;
+      case 'sparkles':
+        return <Sparkles className="w-3.5 h-3.5 text-red-500" />;
+      case 'terminal':
+      default:
+        return <Terminal className="w-3.5 h-3.5 text-red-500" />;
+    }
+  };
 
   const tickerItems = [
     'C# 13',
@@ -22,6 +48,11 @@ export const Hero: React.FC = () => {
     'DDD & CQRS'
   ];
 
+  // Clean phone number for WhatsApp
+  const rawPhone = info?.phone || '+225 07 09 83 74 55';
+  const whatsappPhone = rawPhone.replace(/[^0-9]/g, '');
+  const whatsappUrl = info?.whatsappUrl || `https://wa.me/${whatsappPhone}`;
+
   return (
     <section id="home" className="pt-32 pb-16 sm:pt-40 sm:pb-24 max-w-6xl mx-auto px-4 sm:px-8 relative font-mono">
       
@@ -30,11 +61,11 @@ export const Hero: React.FC = () => {
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-2 px-2.5 py-1 bg-red-950/40 border border-red-500/60 text-red-400 font-bold text-[11px] tracking-wider uppercase">
             <span className="w-2 h-2 bg-red-500 rounded-none animate-ping" />
-            {activeLanguage === 'fr' ? 'DISPONIBLE // MISSIONS & CDI' : 'ACTIVE // OPEN TO OFFERS'}
+            {info?.availabilityText || (activeLanguage === 'fr' ? 'DISPONIBLE // MISSIONS & CDI' : 'ACTIVE // OPEN TO OFFERS')}
           </span>
           <span className="hidden sm:flex items-center gap-1.5 text-zinc-400">
             <MapPin className="w-3.5 h-3.5 text-red-500" />
-            <span>ABIDJAN, CÔTE D'IVOIRE</span>
+            <span>{(info?.location || "ABIDJAN, CÔTE D'IVOIRE").toUpperCase()}</span>
           </span>
         </div>
       </div>
@@ -48,9 +79,9 @@ export const Hero: React.FC = () => {
           </p>
           
           <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter uppercase leading-[0.88] select-none">
-            MOUSSA <br />
+            {info?.firstName || 'MOUSSA ABDOU'} <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-rose-400 to-zinc-100">
-              ABDOU SALAM
+              {info?.lastName || 'SALAM'}
             </span>
           </h1>
         </div>
@@ -58,12 +89,12 @@ export const Hero: React.FC = () => {
         {/* Sub-headline / Role Statement */}
         <div className="border-l-4 border-red-600 pl-4 sm:pl-6 py-2 my-6">
           <h2 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-zinc-100 tracking-tight uppercase">
-            FULL STACK .NET 9 & REACT ENGINEER
+            {info?.title || 'FULL STACK .NET 9 & REACT ENGINEER'}
           </h2>
           <p className="text-sm sm:text-base text-zinc-400 max-w-3xl leading-relaxed pt-2">
-            {activeLanguage === 'fr' 
-              ? (info?.bio?.fr || "Développeur chez GROUPE DIRECTSOFT (+2 ans). Spécialiste de la conception d'architectures logicielles scalables en C#, ASP.NET Core, EF Core, SQL Server / PostgreSQL et d'interfaces web réactives haute performance.")
-              : (info?.bio?.en || "Software Engineer at GROUPE DIRECTSOFT (+2 yrs). Specialized in architecting scalable, resilient backends with C#, ASP.NET Core, EF Core, SQL Server / PostgreSQL alongside high-octane React frontends.")}
+            {info?.headline || info?.bioShort || (activeLanguage === 'fr' 
+              ? "Développeur au sein du GROUPE DIRECTSOFT (+2 ans). Spécialiste de la conception d'architectures logicielles scalables en C#, ASP.NET Core, EF Core, SQL Server / PostgreSQL et d'interfaces web réactives haute performance."
+              : "Software Engineer at GROUPE DIRECTSOFT (+2 yrs). Specialized in architecting scalable, resilient backends with C#, ASP.NET Core, EF Core, SQL Server / PostgreSQL alongside high-octane React frontends.")}
           </p>
         </div>
 
@@ -78,7 +109,7 @@ export const Hero: React.FC = () => {
           </a>
 
           <a
-            href={info?.cvUrl || "/assets/CV_MOUSSA_ABDOU_SALAM.pdf"}
+            href={info?.cvList?.[0]?.url || "/assets/CV_MOUSSA_ABDOU_SALAM.pdf"}
             target="_blank"
             rel="noopener noreferrer"
             className="brutalist-btn-secondary"
@@ -120,49 +151,37 @@ export const Hero: React.FC = () => {
             <span>GITHUB</span>
           </a>
 
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-emerald-400 transition-colors flex items-center gap-1.5 font-bold"
+          >
+            <span className="w-3.5 h-3.5 flex items-center justify-center text-emerald-500 font-bold text-xs">💬</span>
+            <span>WHATSAPP</span>
+          </a>
+
           <span className="text-zinc-600">•</span>
           <span className="text-zinc-400 text-[11px]">NET 9.0 LTS // CLEAN DDD</span>
         </div>
 
       </div>
 
-      {/* Brutalist Stats Cards Grid */}
+      {/* Brutalist Stats Cards Grid (Dynamic from CMS) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-12 pt-6 border-t border-zinc-800">
-        <div className="p-4 bg-[#0d0e14] border border-zinc-800 shadow-[3px_3px_0px_0px_#ef4444] group hover:-translate-y-1 transition-all">
-          <div className="flex items-center justify-between text-zinc-500 mb-1">
-            <span className="text-[10px] uppercase tracking-wider font-bold">01 // EXP</span>
-            <Terminal className="w-3.5 h-3.5 text-red-500" />
+        {statsList.map((stat, idx) => (
+          <div 
+            key={stat.id || idx} 
+            className="p-4 bg-[#0d0e14] border border-zinc-800 shadow-[3px_3px_0px_0px_#ef4444] group hover:-translate-y-1 transition-all"
+          >
+            <div className="flex items-center justify-between text-zinc-500 mb-1">
+              <span className="text-[10px] uppercase tracking-wider font-bold">{stat.indexLabel || `0${idx + 1} // INFO`}</span>
+              {getStatIcon(stat.icon)}
+            </div>
+            <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">{stat.value}</div>
+            <div className="text-[11px] text-zinc-400 uppercase tracking-wider mt-1">{stat.subtitle}</div>
           </div>
-          <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">+2 ANS</div>
-          <div className="text-[11px] text-zinc-400 uppercase tracking-wider mt-1">DIRECTSOFT INGÉNIERIE</div>
-        </div>
-
-        <div className="p-4 bg-[#0d0e14] border border-zinc-800 shadow-[3px_3px_0px_0px_#ef4444] group hover:-translate-y-1 transition-all">
-          <div className="flex items-center justify-between text-zinc-500 mb-1">
-            <span className="text-[10px] uppercase tracking-wider font-bold">02 // STACK</span>
-            <Code2 className="w-3.5 h-3.5 text-red-500" />
-          </div>
-          <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">.NET 9</div>
-          <div className="text-[11px] text-zinc-400 uppercase tracking-wider mt-1">C# & ASP.NET CORE</div>
-        </div>
-
-        <div className="p-4 bg-[#0d0e14] border border-zinc-800 shadow-[3px_3px_0px_0px_#ef4444] group hover:-translate-y-1 transition-all">
-          <div className="flex items-center justify-between text-zinc-500 mb-1">
-            <span className="text-[10px] uppercase tracking-wider font-bold">03 // DATA</span>
-            <Database className="w-3.5 h-3.5 text-red-500" />
-          </div>
-          <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">SQL + PG</div>
-          <div className="text-[11px] text-zinc-400 uppercase tracking-wider mt-1">EF CORE & SCHEMAS</div>
-        </div>
-
-        <div className="p-4 bg-[#0d0e14] border border-zinc-800 shadow-[3px_3px_0px_0px_#ef4444] group hover:-translate-y-1 transition-all">
-          <div className="flex items-center justify-between text-zinc-500 mb-1">
-            <span className="text-[10px] uppercase tracking-wider font-bold">04 // FRONT</span>
-            <Layers className="w-3.5 h-3.5 text-red-500" />
-          </div>
-          <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">REACT+TS</div>
-          <div className="text-[11px] text-zinc-400 uppercase tracking-wider mt-1">MODERN UI CLIENT</div>
-        </div>
+        ))}
       </div>
 
       {/* Infinite Running Marquee Ribbon */}
