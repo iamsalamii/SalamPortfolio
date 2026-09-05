@@ -350,24 +350,9 @@ export const AdminLogin: React.FC = () => {
                   </button>
                 </div>
 
-                {/* OTP Code Preview Badge (For instant testing & validation) */}
-                {otpPreview && (
-                  <div className="p-3.5 bg-zinc-950 border-2 border-red-500 text-center space-y-1">
-                    <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider block">
-                      // CODE OTP SÉCURISÉ GÉNÉRÉ //
-                    </span>
-                    <div className="text-2xl sm:text-3xl font-black text-red-500 tracking-[0.3em] font-mono">
-                      {otpPreview}
-                    </div>
-                    <span className="text-[10px] text-zinc-500 block">
-                      Valable pendant 5 minutes (4 tentatives)
-                    </span>
-                  </div>
-                )}
-
                 <div className="space-y-1">
                   <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400">
-                    // CODE DE VÉRIFICATION (6 CHIFFRES)
+                    // CODE DE VÉRIFICATION (6 CHIFFRES REÇUS PAR EMAIL)
                   </label>
                   <div className="relative">
                     <KeyRound className="w-4 h-4 text-red-500 absolute left-3.5 top-1/2 -translate-y-1/2" />

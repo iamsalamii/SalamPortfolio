@@ -19,6 +19,7 @@ import { Contact } from './components/public/Contact';
 import { CvModal } from './components/public/CvModal';
 import { Footer } from './components/public/Footer';
 import { MaintenanceScreen } from './components/public/MaintenanceScreen';
+import { SectionDivider } from './components/public/SectionDivider';
 import { ScrollToTop } from './components/public/ScrollToTop';
 import { LiquidParticlesBackground } from './components/3d/LiquidParticlesBackground';
 
@@ -147,35 +148,67 @@ const MainAppContent: React.FC = () => {
     }
   }
 
-  // 4. MAIN PUBLIC PORTFOLIO (DATA-DRIVEN SECTION SEQUENCE)
+  // 4. MAIN PUBLIC PORTFOLIO (DATA-DRIVEN SECTION SEQUENCE WITH CHAPTER TRANSITIONS)
   const sections = (data.pageSections || [])
     .filter(s => s.isEnabled && s.sectionKey !== 'blog')
     .sort((a, b) => a.order - b.order);
 
-  const renderSectionByKey = (sectionKey: string) => {
-    switch (sectionKey) {
-      case 'hero':
-        return <Hero key="hero" />;
-      case 'about':
-        return <About key="about" />;
-      case 'experience':
-        return <ExperienceTimeline key="experience" />;
-      case 'education':
-        return <Education key="education" />;
-      case 'tech_stack':
-      case 'technologies':
-        return <TechStack key="tech_stack" />;
-      case 'projects':
-        return <Projects key="projects" />;
-      case 'certifications':
-        return <Certifications key="certifications" />;
-      case 'services':
-        return <Services key="services" />;
-      case 'contact':
-        return <Contact key="contact" />;
-      default:
-        return null;
-    }
+  const totalSections = sections.length;
+
+  const sectionMetadata: Record<string, { title: string; tag: string }> = {
+    hero: { title: "INITIALISATION & PRÉSENTATION", tag: "SYS.CORE" },
+    about: { title: "DÉMARCHE & PHILOSOPHIE LOGICIELLE", tag: "PROFILE.READY" },
+    technologies: { title: "ARSENAL TECHNIQUE & CORE STACK", tag: "STACK.v2026" },
+    tech_stack: { title: "ARSENAL TECHNIQUE & CORE STACK", tag: "STACK.v2026" },
+    projects: { title: "ÉTUDES DE CAS & PROJETS .NET", tag: "PORTFOLIO.DEPLOY" },
+    experience: { title: "PARCOURS & EXPÉRIENCES PRO", tag: "CAREER.LOGS" },
+    education: { title: "FORMATION & DIPLÔMES", tag: "ACADEMIC.SYS" },
+    certifications: { title: "ACCRÉDITATIONS & TITRES", tag: "CERTIFIED.OK" },
+    services: { title: "PRESTATIONS & SERVICES", tag: "SERVICES.ACTIVE" },
+    contact: { title: "CANAL DE COMMUNICATION & CONTACT", tag: "OPEN.DISCUSS" }
+  };
+
+  const renderSectionByKey = (sectionKey: string, index: number) => {
+    const meta = sectionMetadata[sectionKey] || { title: sectionKey.toUpperCase(), tag: "MODULE.OK" };
+    const showDivider = sectionKey !== 'hero';
+
+    return (
+      <React.Fragment key={sectionKey}>
+        {showDivider && (
+          <SectionDivider
+            chapterIndex={index + 1}
+            totalChapters={totalSections}
+            title={meta.title}
+            tag={meta.tag}
+          />
+        )}
+        {(() => {
+          switch (sectionKey) {
+            case 'hero':
+              return <Hero />;
+            case 'about':
+              return <About />;
+            case 'experience':
+              return <ExperienceTimeline />;
+            case 'education':
+              return <Education />;
+            case 'tech_stack':
+            case 'technologies':
+              return <TechStack />;
+            case 'projects':
+              return <Projects />;
+            case 'certifications':
+              return <Certifications />;
+            case 'services':
+              return <Services />;
+            case 'contact':
+              return <Contact />;
+            default:
+              return null;
+          }
+        })()}
+      </React.Fragment>
+    );
   };
 
   return (
@@ -196,7 +229,7 @@ const MainAppContent: React.FC = () => {
         <LiquidParticlesBackground />
         <Navbar />
         <main className="flex-1 relative z-10">
-          {sections.map(s => renderSectionByKey(s.sectionKey))}
+          {sections.map((s, idx) => renderSectionByKey(s.sectionKey, idx))}
         </main>
         <Footer />
         <CvModal />

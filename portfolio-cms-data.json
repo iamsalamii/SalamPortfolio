@@ -810,7 +810,7 @@
     "ogTitle": "Moussa Abdou Salam — Développeur Full Stack .NET",
     "ogDescription": "Développeur Full Stack .NET / React concevant des architectures logicielles robustes et performantes.",
     "ogImage": "/assets/maphotops600.jpg",
-    "canonicalUrl": "https://moussasalam.dev",
+    "canonicalUrl": "https://salam.dev",
     "robotsPolicy": "index, follow"
   },
   "users": [
@@ -824,6 +824,14 @@
     }
   ],
   "activityLogs": [
+    {
+      "id": "log-1788618083184-9lmk",
+      "user": "Salam",
+      "action": "UPDATE",
+      "entityType": "Database",
+      "details": "Application content updated",
+      "timestamp": "2026-09-05T14:21:23.185Z"
+    },
     {
       "id": "log-1788616309319-h3x3",
       "user": "Salam",
@@ -1040,5 +1048,6 @@
       "details": "Portfolio initialisé avec les données exactes du CV de Moussa Abdou Salam",
       "timestamp": "2026-08-29T10:10:08.996Z"
     }
-  ]
+  ],
+  "serviceOfferings": []
 }

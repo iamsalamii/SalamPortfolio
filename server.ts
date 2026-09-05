@@ -4,6 +4,7 @@ import fs from "fs";
 import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
 import bcrypt from "bcryptjs";
+import nodemailer from "nodemailer";
 import { initialSeedData } from "./src/data/seedData.ts";
 import { AppData } from "./src/types.ts";
 import dotenv from "dotenv";
@@ -356,12 +357,56 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
   session.otpSentTo = cleanEmail;
   session.expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes validity
 
+  // Configure nodemailer transporter
+  let transporter: nodemailer.Transporter;
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587,
+      secure: process.env.SMTP_SECURE === "true",
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+  } else {
+    transporter = nodemailer.createTransport({
+      streamTransport: true,
+      newline: "windows"
+    });
+  }
+
+  // Attempt email transmission
+  try {
+    if (process.env.SMTP_HOST) {
+      await transporter.sendMail({
+        from: `"SALAM.DEV Security Console" <${process.env.SMTP_FROM || ADMIN_EMAIL}>`,
+        to: cleanEmail,
+        subject: `[SALAM.DEV] Votre Code de Sécurité 2FA : ${otpCode}`,
+        text: `Bonjour Moussa Abdou Salam,\n\nVotre code d'authentification 2FA à usage unique est : ${otpCode}\n\nCe code est valable pendant 5 minutes.\n\n— Console de Sécurité SALAM.DEV`,
+        html: `<div style="font-family: monospace; background:#060709; color:#f4f4f5; padding:24px; border-radius:12px; border:2px solid #ef4444; max-width:500px;">
+          <h2 style="color:#ef4444; margin-top:0;">// CODE DE SÉCURITÉ 2FA OTP //</h2>
+          <p style="font-size:14px; color:#a1a1aa;">Bonjour <strong>Moussa Abdou Salam</strong>,</p>
+          <p style="font-size:14px; color:#a1a1aa;">Voici votre code de vérification pour accéder à la Console d'Administration :</p>
+          <div style="background:#18181b; border:1px solid #ef4444; padding:16px; text-align:center; font-size:28px; font-weight:bold; letter-spacing:8px; color:#ef4444; margin:18px 0;">
+            ${otpCode}
+          </div>
+          <p style="font-size:12px; color:#71717a;">Ce code expire dans 5 minutes. Ne le partagez avec personne.</p>
+        </div>`
+      });
+    }
+  } catch (mailErr) {
+    console.warn("SMTP email notification:", mailErr);
+  }
+
+  // Log securely to terminal
+  console.log(`\n======================================================\n[2FA OTP SECURITY DISPATCH]\nDESTINATION : ${cleanEmail}\nCODE OTP    : ${otpCode}\nVALIDITY    : 5 minutes\n======================================================\n`);
+
   addActivityLog(session.name, "OTP_DISPATCHED", "Security", `OTP code dispatched to personal address ${cleanEmail}`);
 
   return res.json({
     success: true,
-    message: `Code OTP de sécurité transmis avec succès à votre adresse personnelle (${cleanEmail}).`,
-    otpPreview: otpCode
+    message: `Code OTP de sécurité transmis avec succès à votre adresse personnelle (${cleanEmail}). Consultez votre boîte email.`
   });
 });
 
