@@ -68,15 +68,23 @@ export const AdminTechnologies: React.FC = () => {
       nextTech = [...technologies, editingTech as Technology];
     }
 
-    await updateData({ technologies: nextTech });
-    setIsTechModalOpen(false);
-    setEditingTech(null);
+    try {
+      await updateData({ technologies: nextTech });
+      setIsTechModalOpen(false);
+      setEditingTech(null);
+    } catch (err: any) {
+      alert(`Erreur d'enregistrement de la technologie : ${err?.message || 'Échec de synchronisation'}`);
+    }
   };
 
   const handleDeleteTech = async (id: string) => {
     if (confirm('Voulez-vous supprimer cette technologie ?')) {
       const next = technologies.filter(t => t.id !== id);
-      await updateData({ technologies: next });
+      try {
+        await updateData({ technologies: next });
+      } catch (err: any) {
+        alert(`Erreur de suppression de la technologie : ${err?.message || 'Échec de synchronisation'}`);
+      }
     }
   };
 
@@ -143,7 +151,7 @@ export const AdminTechnologies: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center">
-                    <TechLogo name={t.name} size={20} />
+                    <TechLogo name={t.name} logoUrl={t.logoUrl} size={20} />
                   </div>
                   <div>
                     <h3 className="font-bold text-slate-950 text-sm leading-snug">{t.name}</h3>
@@ -191,14 +199,38 @@ export const AdminTechnologies: React.FC = () => {
             </div>
 
             <form onSubmit={handleSaveTech} className="space-y-4">
+              {/* Technology Name Input & Live Detection Preview */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Nom de la Technologie *</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: C#, PostgreSQL, OpenAI, n8n, Make, Copilot..."
+                    value={editingTech.name || ''}
+                    onChange={(e) => setEditingTech({ ...editingTech, name: e.target.value })}
+                    className="flex-1 px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
+                  />
+                  <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center shrink-0 shadow-xs" title="Aperçu du logo détecté">
+                    <TechLogo name={editingTech.name || ''} logoUrl={editingTech.logoUrl} size={22} />
+                  </div>
+                </div>
+                <span className="text-[10px] text-slate-500 mt-1 block">
+                  Détection automatique du logo vectoriel officiel en temps réel.
+                </span>
+              </div>
+
+              {/* Optional Manual Logo URL Override */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  URL d'un logo personnalisé (Optionnel - pour remplacer la détection)
+                </label>
                 <input
-                  type="text"
-                  required
-                  value={editingTech.name || ''}
-                  onChange={(e) => setEditingTech({ ...editingTech, name: e.target.value })}
-                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600"
+                  type="url"
+                  placeholder="https://.../mon-logo.svg ou /uploads/..."
+                  value={editingTech.logoUrl || ''}
+                  onChange={(e) => setEditingTech({ ...editingTech, logoUrl: e.target.value })}
+                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-red-600 font-mono"
                 />
               </div>
 

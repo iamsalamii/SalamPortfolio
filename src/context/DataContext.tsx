@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { AppData, AdminUser, ThemeMode } from '../types';
+import { AppData, AdminUser, ThemeMode, PersonalInfo } from '../types';
 import { initialSeedData } from '../data/seedData';
 
 interface DataContextType {
@@ -34,6 +34,8 @@ interface DataContextType {
     success: boolean;
     message?: string;
     otpPreview?: string;
+    isSmtpConfigured?: boolean;
+    devOtpCode?: string;
     error?: string;
   }>;
   verifyOtp: (tempToken: string, otpCode: string) => Promise<{
@@ -59,11 +61,30 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = 'salam_dotnet_portfolio_v3';
-const AUTH_STORAGE_KEY = 'salam_admin_user_v3';
-const TOKEN_STORAGE_KEY = 'salam_auth_token_v3';
-const LANG_STORAGE_KEY = 'salam_active_lang_v3';
-const THEME_STORAGE_KEY = 'salam_theme_mode_v3';
+export const LOCAL_STORAGE_KEY = 'salam_dotnet_portfolio_v3';
+export const AUTH_STORAGE_KEY = 'salam_admin_user_v3';
+export const TOKEN_STORAGE_KEY = 'salam_auth_token_v3';
+export const LANG_STORAGE_KEY = 'salam_active_lang_v3';
+export const THEME_STORAGE_KEY = 'salam_theme_mode_v3';
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+export const apiUrl = (endpoint: string): string => `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+
+export function getLocalizedField<T extends Record<string, any>>(
+  item: T | undefined | null,
+  field: keyof T,
+  activeLanguage: string
+): any {
+  if (!item) return '';
+  if (activeLanguage !== 'fr' && item.translations?.[activeLanguage]?.[field]) {
+    const val = item.translations[activeLanguage][field];
+    if (val !== undefined && val !== null) {
+      if (typeof val === 'string' && val.trim().length > 0) return val;
+      if (Array.isArray(val) && val.length > 0) return val;
+      if (typeof val === 'object') return val;
+    }
+  }
+  return item[field];
+}
 
 const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem(TOKEN_STORAGE_KEY);
@@ -85,7 +106,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (parsed?.personalInfo?.firstName === 'Abdou Salam') {
+        if (parsed && parsed.personalInfo && typeof parsed.personalInfo === 'object') {
           return sanitizeAppData(parsed);
         }
       }
@@ -152,7 +173,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const fetchApiData = async () => {
       try {
-        const res = await fetch('/api/data');
+        const res = await fetch(apiUrl('/api/data'), { cache: 'no-store' });
         if (res.ok) {
           const json = await res.json();
           if (json && json.personalInfo) {
@@ -174,6 +195,25 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchApiData();
   }, []);
 
+  // Cross-Tab Synchronization: immediately sync state across open browser tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === LOCAL_STORAGE_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed && parsed.personalInfo) {
+            setData(sanitizeAppData(parsed));
+          }
+        } catch {
+          // ignore
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // Handle URL hash / routing synchronization - defaults to public developer portfolio
   useEffect(() => {
     const handleLocation = () => {
@@ -188,14 +228,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setAdminActiveTab(tabMatch[1]);
         }
       } else {
-        // Leaving admin to public portfolio -> immediate auto logout
-        const currentToken = localStorage.getItem(TOKEN_STORAGE_KEY);
-        if (currentToken) {
-          setCurrentUser(null);
-          localStorage.removeItem(AUTH_STORAGE_KEY);
-          localStorage.removeItem(TOKEN_STORAGE_KEY);
-        }
-
         if (path.startsWith('/projects/') || hash.startsWith('#project/')) {
           const slug = path.startsWith('/projects/') ? path.replace('/projects/', '') : hash.replace('#project/', '');
           setSelectedSlug(slug);
@@ -238,13 +270,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const navigateTo = useCallback((view: 'portfolio' | 'project-detail' | 'blog-detail' | 'admin', slug?: string) => {
-    // If leaving admin space to return to public portfolio, immediately log out
-    if (currentView === 'admin' && view === 'portfolio') {
-      setCurrentUser(null);
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-      localStorage.removeItem(TOKEN_STORAGE_KEY);
-    }
-
     setCurrentView(view);
     if (slug) setSelectedSlug(slug);
 
@@ -252,13 +277,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       window.location.hash = slug ? `#admin/${slug}` : '#admin';
     } else if (view === 'project-detail' && slug) {
       window.location.hash = `#project/${slug}`;
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     } else if (view === 'blog-detail' && slug) {
       window.location.hash = `#blog/${slug}`;
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     } else {
       window.location.hash = '';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }
-  }, [currentView]);
+  }, []);
 
   const t = useCallback((key: string, defaultText?: string): string => {
     const langDict = data.translations?.[activeLanguage] || data.translations?.['en'] || {};
@@ -270,22 +297,59 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateData = async (newData: Partial<AppData>) => {
     setIsSaving(true);
-    const merged: AppData = { ...data, ...newData };
-    setData(merged);
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(merged));
-    } catch {
-      // ignore
+    let merged: AppData = { ...data, ...newData };
+    
+    // Sync socialLinks if personalInfo updated
+    if (newData.personalInfo) {
+      const email = newData.personalInfo.email;
+      const linkedin = newData.personalInfo.linkedinUrl;
+      const github = newData.personalInfo.githubUrl;
+      if (email || linkedin || github) {
+        const nextSocial = (merged.socialLinks || []).map(s => {
+          if (email && (s.platform.toLowerCase() === 'email' || s.id === 'soc-email')) {
+            return { ...s, url: `mailto:${email}` };
+          }
+          if (linkedin && (s.platform.toLowerCase() === 'linkedin' || s.id === 'soc-linkedin')) {
+            return { ...s, url: linkedin };
+          }
+          if (github && (s.platform.toLowerCase() === 'github' || s.id === 'soc-github')) {
+            return { ...s, url: github };
+          }
+          return s;
+        });
+        merged = { ...merged, socialLinks: nextSocial };
+      }
     }
 
     try {
-      await fetch('/api/data', {
+      const headers = getAuthHeaders();
+      if (!headers['Authorization']) {
+        throw new Error("Session administrateur expirée ou non autorisée. Veuillez vous reconnecter.");
+      }
+
+      const res = await fetch(apiUrl('/api/data'), {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers,
         body: JSON.stringify(merged)
       });
-    } catch (err) {
-      console.warn('Could not sync to backend API:', err);
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || `Erreur serveur (${res.status}) lors de l'enregistrement`);
+      }
+
+      const resJson = await res.json().catch(() => null);
+      const verifiedData = (resJson && resJson.data) ? sanitizeAppData(resJson.data) : merged;
+
+      setData(verifiedData);
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(verifiedData));
+      } catch {
+        // ignore
+      }
+    } catch (err: any) {
+      console.error('Could not sync to backend API:', err);
+      throw err;
     } finally {
       setTimeout(() => setIsSaving(false), 300);
     }
@@ -293,22 +357,72 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateModule = async <K extends keyof AppData>(moduleKey: K, payload: AppData[K]) => {
     setIsSaving(true);
-    const merged: AppData = { ...data, [moduleKey]: payload };
-    setData(merged);
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(merged));
-    } catch {
-      // ignore
+    let merged: AppData = { ...data, [moduleKey]: payload };
+
+    // Sync socialLinks if personalInfo module updated
+    if (moduleKey === 'personalInfo' && payload) {
+      const pInfo = payload as unknown as PersonalInfo;
+      if (pInfo.email || pInfo.linkedinUrl || pInfo.githubUrl) {
+        const nextSocial = (merged.socialLinks || []).map(s => {
+          if (pInfo.email && (s.platform.toLowerCase() === 'email' || s.id === 'soc-email')) {
+            return { ...s, url: `mailto:${pInfo.email}` };
+          }
+          if (pInfo.linkedinUrl && (s.platform.toLowerCase() === 'linkedin' || s.id === 'soc-linkedin')) {
+            return { ...s, url: pInfo.linkedinUrl };
+          }
+          if (pInfo.githubUrl && (s.platform.toLowerCase() === 'github' || s.id === 'soc-github')) {
+            return { ...s, url: pInfo.githubUrl };
+          }
+          return s;
+        });
+        merged = { ...merged, socialLinks: nextSocial };
+      }
     }
 
     try {
-      await fetch(`/api/module/${String(moduleKey)}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(payload)
-      });
-    } catch (err) {
-      console.warn(`Could not sync module ${String(moduleKey)}:`, err);
+      const headers = getAuthHeaders();
+      if (!headers['Authorization']) {
+        throw new Error("Session administrateur expirée ou non autorisée. Veuillez vous reconnecter.");
+      }
+
+      let res: Response;
+      // If module is personalInfo, save both personalInfo and updated socialLinks via /api/data or specific endpoint
+      if (moduleKey === 'personalInfo') {
+        res = await fetch(apiUrl('/api/data'), {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(merged)
+        });
+      } else {
+        res = await fetch(apiUrl(`/api/module/${String(moduleKey)}`), {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(payload)
+        });
+      }
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || `Erreur serveur (${res.status}) lors de la mise à jour`);
+      }
+
+      const resJson = await res.json().catch(() => null);
+      let verifiedData: AppData = merged;
+      if (moduleKey === 'personalInfo' && resJson && resJson.data) {
+        verifiedData = sanitizeAppData(resJson.data);
+      } else if (resJson && resJson[String(moduleKey)] !== undefined) {
+        verifiedData = { ...data, [moduleKey]: resJson[String(moduleKey)] };
+      }
+
+      setData(verifiedData);
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(verifiedData));
+      } catch {
+        // ignore
+      }
+    } catch (err: any) {
+      console.error(`Could not sync module ${String(moduleKey)}:`, err);
+      throw err;
     } finally {
       setTimeout(() => setIsSaving(false), 300);
     }
@@ -324,7 +438,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // ignore
     }
     try {
-      await fetch('/api/data/reset-seed', {
+      await fetch(apiUrl('/api/data/reset-seed'), {
         method: 'POST',
         headers: getAuthHeaders()
       });
@@ -357,7 +471,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // ignore
     }
     try {
-      await fetch('/api/data/clear', {
+      await fetch(apiUrl('/api/data/clear'), {
         method: 'POST',
         headers: getAuthHeaders()
       });
@@ -388,7 +502,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await updateModule('contactMessages', updatedMessages);
 
     try {
-      const res = await fetch('/api/messages', {
+      const res = await fetch(apiUrl('/api/messages'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(msg)
@@ -407,7 +521,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Secure Server-Only Authentication (Zero hardcoded credentials on client, with 2FA OTP)
   const login = async (username: string, password: string) => {
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: username.trim(), password: password.trim() })
@@ -452,7 +566,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const requestOtp = async (tempToken: string, destinationEmail: string) => {
     try {
-      const res = await fetch('/api/auth/request-otp', {
+      const res = await fetch(apiUrl('/api/auth/request-otp'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tempToken, destinationEmail: destinationEmail.trim() })
@@ -482,7 +596,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const verifyOtp = async (tempToken: string, otpCode: string) => {
     try {
-      const res = await fetch('/api/auth/verify-otp', {
+      const res = await fetch(apiUrl('/api/auth/verify-otp'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tempToken, otpCode: otpCode.trim() })
@@ -509,7 +623,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resendOtp = async (tempToken: string) => {
     try {
-      const res = await fetch('/api/auth/resend-otp', {
+      const res = await fetch(apiUrl('/api/auth/resend-otp'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tempToken })
@@ -526,7 +640,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetRateLimit = async () => {
     try {
-      await fetch('/api/auth/reset-rate-limit', { method: 'POST' });
+      await fetch(apiUrl('/api/auth/reset-rate-limit'), { method: 'POST' });
     } catch {
       // ignore
     }

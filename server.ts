@@ -85,9 +85,12 @@ interface RateLimitInfo {
 
 interface OtpSession {
   userId: string;
-  email: string;
+  email?: string;
+  adminEmail?: string;
+  personalEmailExpected?: string;
+  otpSentTo?: string;
   name: string;
-  otpCode: string;
+  otpCode?: string;
   expiresAt: number;
   attempts: number;
 }
@@ -264,6 +267,9 @@ function addActivityLog(user: string, action: string, entityType: string, detail
 
 // GET Full App Data (Public Read)
 app.get("/api/data", (req: Request, res: Response) => {
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.set("Pragma", "no-cache");
+  res.set("Expires", "0");
   res.json(currentData);
 });
 
@@ -284,7 +290,8 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
     });
   }
 
-  const { username, password } = req.body;
+  const username = req.body.username || req.body.email;
+  const password = req.body.password;
   if (!username || !password) {
     return res.status(401).json({ 
       error: "Identifiants requis.",
@@ -311,15 +318,15 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
       avatarUrl: "/assets/maphotops600.jpg"
     };
 
-    // Expected personal email configured in personal info
-    const configuredPersonalEmail = (currentData.personalInfo?.email || "moussasalam86@gmail.com").trim().toLowerCase();
+    // Dedicated 2FA security email (isolated from public contact email, defaults to moussasalam86@gmail.com)
+    const configuredSecurityEmail = (process.env.SECURITY_OTP_EMAIL || currentData.securitySettings?.otpEmail || "moussasalam86@gmail.com").trim().toLowerCase();
 
     const tempToken = crypto.randomBytes(24).toString("hex");
 
     otpSessions.set(tempToken, {
       userId: userPayload.id,
       adminEmail: userPayload.email,
-      personalEmailExpected: configuredPersonalEmail,
+      personalEmailExpected: configuredSecurityEmail,
       name: userPayload.name,
       expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes session
       attempts: 4
@@ -360,11 +367,12 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
   }
 
   const cleanEmail = String(destinationEmail).trim().toLowerCase();
+  const expectedSecurityEmail = (session.personalEmailExpected || process.env.SECURITY_OTP_EMAIL || currentData.securitySettings?.otpEmail || "moussasalam86@gmail.com").trim().toLowerCase();
   
-  // Validate entered personal email against configured personal email
-  if (cleanEmail !== session.personalEmailExpected) {
+  // Validate entered personal email against configured security email
+  if (cleanEmail !== expectedSecurityEmail) {
     return res.status(403).json({
-      error: "Cette adresse email personnelle ne correspond pas à celle configurée dans vos paramètres CMS de sécurité."
+      error: "Cette adresse email personnelle ne correspond pas à celle configurée pour la sécurité 2FA."
     });
   }
 
@@ -375,7 +383,7 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
   session.expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes validity
 
   // Configure nodemailer transporter
-  let transporter: nodemailer.Transporter | null = null;
+  let transporter: any = null;
   let emailDeliverySuccess = false;
   let emailDeliveryError: string | null = null;
 
@@ -402,8 +410,9 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
     }
   }
 
-  // Attempt email transmission
-  if (transporter) {
+  // Attempt email transmission (bypassed if x-test-mode header is set to prevent sending real emails during automated tests)
+  const isTestMode = req.headers["x-test-mode"] === "true";
+  if (transporter && !isTestMode) {
     try {
       const mailInfo = await transporter.sendMail({
         from: `"SALAM.DEV Security Console" <${process.env.SMTP_FROM || process.env.SMTP_USER || ADMIN_EMAIL}>`,
@@ -428,12 +437,17 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
     }
   }
 
-  // Log securely to terminal
-  console.log(`\n======================================================\n[2FA OTP SECURITY DISPATCH]\nDESTINATION : ${cleanEmail}\nCODE OTP    : ${otpCode}\nVALIDITY    : 5 minutes\nSMTP STATUS : ${emailDeliverySuccess ? "ENVOYÉ AVEC SUCCÈS VIA GMAIL" : transporter ? "ÉCHEC ENVOI (" + emailDeliveryError + ")" : "NON CONFIGURÉ (Mode Local)"}\n======================================================\n`);
+  // Log securely to terminal (Masked in production to prevent log leaks)
+  if (process.env.NODE_ENV === "production") {
+    console.log(`[2FA OTP SECURITY DISPATCH] Code dispatched to security email: ${cleanEmail.substring(0, 3)}***@*** (SMTP: ${emailDeliverySuccess ? "OK" : "FAILED"})`);
+  } else if (!isTestMode) {
+    console.log(`\n======================================================\n[2FA OTP SECURITY DISPATCH]\nDESTINATION : ${cleanEmail}\nCODE OTP    : ${otpCode}\nVALIDITY    : 5 minutes\nSMTP STATUS : ${emailDeliverySuccess ? "ENVOYÉ AVEC SUCCÈS VIA GMAIL" : transporter ? "ÉCHEC ENVOI (" + emailDeliveryError + ")" : "NON CONFIGURÉ (Mode Local)"}\n======================================================\n`);
+  }
 
-  addActivityLog(session.name, "OTP_DISPATCHED", "Security", `OTP code dispatched to personal address ${cleanEmail} (SMTP: ${emailDeliverySuccess ? "OK" : "LOCAL/ERROR"})`);
+  addActivityLog(session.name, "OTP_DISPATCHED", "Security", `OTP code dispatched to personal address (SMTP: ${emailDeliverySuccess ? "OK" : "LOCAL/ERROR"})`);
 
   const isSmtpConfigured = emailDeliverySuccess;
+  const isProduction = process.env.NODE_ENV === "production";
 
   return res.json({
     success: true,
@@ -441,7 +455,7 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
     message: emailDeliverySuccess
       ? `Code OTP expédié avec succès à votre adresse personnelle (${cleanEmail}). Consultez votre boîte de réception Gmail.`
       : `Code OTP généré. ${emailDeliveryError ? "Erreur SMTP: " + emailDeliveryError : "Mode local actif : code consigné dans la console terminal serveur."}`,
-    devOtpCode: emailDeliverySuccess ? undefined : otpCode
+    devOtpCode: (!isProduction && !emailDeliverySuccess && !isTestMode) ? otpCode : undefined
   });
 });
 
@@ -634,6 +648,136 @@ app.post("/api/messages", async (req: Request, res: Response) => {
   await persistData();
 
   res.json({ success: true, messageId: newMessage.id });
+});
+
+// ---------------- 6. PROJECT LIVE SCREENSHOT CAPTURE (Admin Protected) ----------------
+function isPrivateIp(ip: string): boolean {
+  if (!ip) return true;
+  if (ip === "localhost" || ip === "127.0.0.1" || ip === "::1" || ip === "0.0.0.0") return true;
+  if (ip.startsWith("10.") || ip.startsWith("192.168.")) return true;
+  if (ip.startsWith("169.254.")) return true;
+  if (ip.startsWith("172.")) {
+    const parts = ip.split(".");
+    if (parts.length >= 2) {
+      const second = parseInt(parts[1], 10);
+      if (second >= 16 && second <= 31) return true;
+    }
+  }
+  return false;
+}
+
+app.post("/api/admin/capture-preview", requireAdminAuth, async (req: Request, res: Response) => {
+  const { url } = req.body;
+  if (!url || typeof url !== "string") {
+    return res.status(400).json({ error: "URL publique du site requise." });
+  }
+
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url.trim());
+  } catch {
+    return res.status(400).json({ error: "Format d'URL invalide. Exemple: https://mon-site.com" });
+  }
+
+  if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+    return res.status(400).json({ error: "Seuls les protocoles HTTP et HTTPS sont autorisés." });
+  }
+
+  const hostname = parsedUrl.hostname.toLowerCase();
+  if (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1" ||
+    hostname === "0.0.0.0" ||
+    isPrivateIp(hostname) ||
+    hostname.endsWith(".local") ||
+    hostname.endsWith(".internal")
+  ) {
+    return res.status(403).json({ error: "Capture interdite sur les adresses locales ou privées (Protection SSRF)." });
+  }
+
+  try {
+    const uploadsDir = path.join(process.cwd(), "public", "uploads", "projects");
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const cleanTarget = parsedUrl.toString();
+    let imageBuffer: Buffer | null = null;
+    let fileExt = "png";
+
+    // Tier 1: Microlink API
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+      const microlinkUrl = `https://api.microlink.io?url=${encodeURIComponent(cleanTarget)}&screenshot=true&embed=screenshot.url`;
+      const mlRes = await fetch(microlinkUrl, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (mlRes.ok) {
+        const contentType = mlRes.headers.get("content-type") || "";
+        if (contentType.includes("image/")) {
+          const arrayBuf = await mlRes.arrayBuffer();
+          if (arrayBuf.byteLength > 2000) {
+            imageBuffer = Buffer.from(arrayBuf);
+            fileExt = contentType.includes("jpeg") || contentType.includes("jpg") ? "jpg" : "png";
+          }
+        }
+      }
+    } catch {
+      // Fallback
+    }
+
+    // Tier 2: WordPress mShots API
+    if (!imageBuffer) {
+      try {
+        const controller2 = new AbortController();
+        const timeoutId2 = setTimeout(() => controller2.abort(), 12000);
+
+        const mshotsUrl = `https://s0.wp.com/mshots/v1/${encodeURIComponent(cleanTarget)}?w=1280&h=800`;
+        const msRes = await fetch(mshotsUrl, { signal: controller2.signal });
+        clearTimeout(timeoutId2);
+
+        if (msRes.ok) {
+          const contentType = msRes.headers.get("content-type") || "";
+          if (contentType.includes("image/")) {
+            const arrayBuf = await msRes.arrayBuffer();
+            if (arrayBuf.byteLength > 2000) {
+              imageBuffer = Buffer.from(arrayBuf);
+              fileExt = "jpg";
+            }
+          }
+        }
+      } catch {
+        // Fallback
+      }
+    }
+
+    if (!imageBuffer || imageBuffer.byteLength < 1000) {
+      return res.status(422).json({
+        error: "Impossible de capturer le site web (site inaccessible ou délai dépassé). Vous pouvez importer une image manuellement."
+      });
+    }
+
+    const fileName = `preview-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+    const filePath = path.join(uploadsDir, fileName);
+    fs.writeFileSync(filePath, imageBuffer);
+
+    const publicUrl = `/uploads/projects/${fileName}`;
+    addActivityLog("Salam", "CAPTURE", "Projects", `Captured live preview for ${hostname}`);
+
+    return res.json({
+      success: true,
+      imageUrl: publicUrl,
+      message: "Capture d'écran du site générée et enregistrée avec succès."
+    });
+  } catch (err: any) {
+    console.error("Capture preview error:", err);
+    return res.status(500).json({
+      error: "Erreur lors de la capture de l'image. Vous pouvez importer une image manuellement."
+    });
+  }
 });
 
 // Health check endpoint

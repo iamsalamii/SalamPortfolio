@@ -7,7 +7,7 @@ export const TechStack: React.FC = () => {
   const { data, activeLanguage } = useData();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const categories = activeLanguage === 'fr' ? [
+  const defaultCategories = activeLanguage === 'fr' ? [
     { id: 'all', label: 'TOUT // ALL' },
     { id: 'tc-backend', label: 'BACKEND .NET' },
     { id: 'tc-frontend', label: 'FRONTEND REACT' },
@@ -20,6 +20,15 @@ export const TechStack: React.FC = () => {
     { id: 'tc-database', label: 'DATA & STORAGE' },
     { id: 'tc-tools', label: 'DEVOPS & TOOLS' }
   ];
+
+  const categories = (data.techCategories && data.techCategories.length > 0)
+    ? [
+        { id: 'all', label: activeLanguage === 'fr' ? 'TOUT // ALL' : 'ALL // CORE' },
+        ...[...data.techCategories]
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+          .map((cat) => ({ id: cat.id, label: cat.name.toUpperCase() }))
+      ]
+    : defaultCategories;
 
   const technologies = data.technologies || [];
 
@@ -69,7 +78,7 @@ export const TechStack: React.FC = () => {
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-9 h-9 bg-zinc-950 border border-zinc-800 flex items-center justify-center p-2 shrink-0 group-hover:border-red-500/60 transition-colors">
-                <TechLogo name={tech.name} size={20} className="w-5 h-5 object-contain" />
+                <TechLogo name={tech.name} logoUrl={tech.logoUrl} size={20} className="w-5 h-5 object-contain" />
               </div>
               <div className="min-w-0">
                 <h3 className="text-xs sm:text-sm font-extrabold text-white truncate group-hover:text-red-400 transition-colors tracking-tight">

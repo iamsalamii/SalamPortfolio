@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useData } from '../../context/DataContext';
+import { useData, apiUrl } from '../../context/DataContext';
 import { Mail, Phone, Copy, Check, Send, ArrowUpRight } from 'lucide-react';
 
 export const Contact: React.FC = () => {
@@ -34,7 +34,7 @@ export const Contact: React.FC = () => {
     setErrorMessage('');
 
     try {
-      const response = await fetch('/api/messages', {
+      const response = await fetch(apiUrl('/api/messages'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

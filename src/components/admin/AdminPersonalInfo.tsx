@@ -56,9 +56,13 @@ export const AdminPersonalInfo: React.FC = () => {
   // Handle save
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateModule('personalInfo', info);
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3500);
+    try {
+      await updateModule('personalInfo', info);
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3500);
+    } catch (err: any) {
+      alert(`Erreur d'enregistrement : ${err?.message || 'Échec de synchronisation'}`);
+    }
   };
 
   // Add specialty
