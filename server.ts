@@ -265,6 +265,11 @@ function addActivityLog(user: string, action: string, entityType: string, detail
 
 // ---------------- 5. REST API ROUTES ----------------
 
+// Health Check Endpoint (Docker & Coolify Healthcheck)
+app.get("/api/health", (req: Request, res: Response) => {
+  res.status(200).json({ status: "healthy", timestamp: new Date().toISOString() });
+});
+
 // GET Full App Data (Public Read)
 app.get("/api/data", (req: Request, res: Response) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
