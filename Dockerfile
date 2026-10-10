@@ -8,14 +8,17 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+# Forcer NODE_ENV=development pendant le build pour installer Vite et TypeScript
+ENV NODE_ENV=development
+
 # Installation des dépendances système requises pour le build
 RUN apk add --no-cache libc6-compat
 
 # Copie des fichiers de configuration de paquets
 COPY package.json package-lock.json* ./
 
-# Installation complète des dépendances (y compris dev pour build)
-RUN npm ci
+# Installation complète des dépendances
+RUN npm ci || npm install
 
 # Copie du code source complet
 COPY . .
@@ -37,7 +40,7 @@ RUN addgroup --system --gid 1001 nodejs && \
 
 # Copie des dépendances de production uniquement
 COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev && npm cache clean --force
+RUN (npm ci --omit=dev || npm install --omit=dev) && npm cache clean --force
 
 # Copie des artefacts compilés depuis l'étape de build
 COPY --from=builder /app/dist ./dist
