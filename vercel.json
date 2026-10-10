@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/:match*",
-      "destination": "https://iff24czsjakxws8othhq3iwt.2.28.63.25.sslip.io/api/:match*"
+      "destination": "http://iff24czsjakxws8othhq3iwt.2.28.63.25.sslip.io/api/:match*"
     },
     {
       "source": "/(.*)",
