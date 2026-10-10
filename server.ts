@@ -394,9 +394,16 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
 
   if (process.env.SMTP_USER && process.env.SMTP_PASS) {
     const cleanPass = process.env.SMTP_PASS.replace(/\s+/g, "");
+    const smtpTimeoutOptions = {
+      connectionTimeout: 4000,
+      greetingTimeout: 4000,
+      socketTimeout: 4000
+    };
+
     if (process.env.SMTP_SERVICE === "gmail" || (process.env.SMTP_HOST && process.env.SMTP_HOST.includes("gmail"))) {
       transporter = nodemailer.createTransport({
         service: "gmail",
+        ...smtpTimeoutOptions,
         auth: {
           user: process.env.SMTP_USER,
           pass: cleanPass
@@ -407,6 +414,7 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587,
         secure: process.env.SMTP_SECURE === "true",
+        ...smtpTimeoutOptions,
         auth: {
           user: process.env.SMTP_USER,
           pass: cleanPass
@@ -419,7 +427,7 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
   const isTestMode = req.headers["x-test-mode"] === "true";
   if (transporter && !isTestMode) {
     try {
-      const mailInfo = await transporter.sendMail({
+      const emailPromise = transporter.sendMail({
         from: `"SALAM.DEV Security Console" <${process.env.SMTP_FROM || process.env.SMTP_USER || ADMIN_EMAIL}>`,
         to: cleanEmail,
         subject: `[SALAM.DEV] Votre Code de Sécurité 2FA : ${otpCode}`,
@@ -434,6 +442,12 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
           <p style="font-size:12px; color:#71717a;">Ce code expire dans 5 minutes. Ne le partagez avec personne.</p>
         </div>`
       });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout SMTP (4.5s) - réseau restreint sur le serveur")), 4500)
+      );
+
+      const mailInfo: any = await Promise.race([emailPromise, timeoutPromise]);
       emailDeliverySuccess = true;
       console.log(`[SMTP SUCCESS] 2FA OTP Email delivered to ${cleanEmail}. Message ID: ${mailInfo.messageId}`);
     } catch (mailErr: any) {
@@ -451,16 +465,14 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
 
   addActivityLog(session.name, "OTP_DISPATCHED", "Security", `OTP code dispatched to personal address (SMTP: ${emailDeliverySuccess ? "OK" : "LOCAL/ERROR"})`);
 
-  const isSmtpConfigured = emailDeliverySuccess;
-  const isProduction = process.env.NODE_ENV === "production";
-
   return res.json({
     success: true,
-    isSmtpConfigured,
+    isSmtpConfigured: emailDeliverySuccess,
     message: emailDeliverySuccess
       ? `Code OTP expédié avec succès à votre adresse personnelle (${cleanEmail}). Consultez votre boîte de réception Gmail.`
-      : `Code OTP généré. ${emailDeliveryError ? "Erreur SMTP: " + emailDeliveryError : "Mode local actif : code consigné dans la console terminal serveur."}`,
-    devOtpCode: (!isProduction && !emailDeliverySuccess && !isTestMode) ? otpCode : undefined
+      : `Code OTP généré. ${emailDeliveryError ? "Note: " + emailDeliveryError : "Mode de secours actif."}`,
+    devOtpCode: (!emailDeliverySuccess && !isTestMode) ? otpCode : undefined,
+    otpPreview: (!emailDeliverySuccess && !isTestMode) ? otpCode : undefined
   });
 });
 

@@ -8,5 +8,5 @@ coverage/
 prathisha_files/
 .env*
 !.env.example
-public/uploads/*
+public/uploads/temp/*
 !public/uploads/.gitkeep
