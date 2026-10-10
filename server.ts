@@ -48,23 +48,19 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     return res.sendStatus(204);
   }
 
-  // Block direct HTTP access to source code and sensitive secret files (.env, *.ts, *.json, *.sql, *.log, *.git)
+  // Block direct HTTP access to source code and sensitive secret files (.env, *.sql, *.log, *.git)
   const cleanPath = req.path.toLowerCase();
-  if (
-    !cleanPath.startsWith("/api/") &&
-    (
-      cleanPath.includes(".env") ||
-      cleanPath.endsWith(".ts") ||
-      cleanPath.endsWith(".tsx") ||
-      cleanPath.endsWith(".json") ||
-      cleanPath.endsWith(".sql") ||
-      cleanPath.endsWith(".log") ||
-      cleanPath.includes(".git") ||
-      cleanPath.endsWith(".md") ||
-      cleanPath.endsWith(".lock")
-    )
-  ) {
-    return res.status(403).json({ error: "Accès interdit aux ressources protégées." });
+  
+  if (!cleanPath.startsWith("/api/")) {
+    const isSensitiveExt = cleanPath.includes(".env") || cleanPath.endsWith(".sql") || cleanPath.endsWith(".log") || cleanPath.includes(".git") || cleanPath.endsWith(".lock");
+    
+    // In production, block .ts/.tsx. In dev, allow them for Vite. Block .json except manifest.json (if any)
+    const isSourceExt = IS_PROD && (cleanPath.endsWith(".ts") || cleanPath.endsWith(".tsx"));
+    const isBlockedJson = cleanPath.endsWith(".json") && !cleanPath.endsWith("manifest.json");
+
+    if (isSensitiveExt || isSourceExt || isBlockedJson || cleanPath.endsWith(".md")) {
+      return res.status(403).json({ error: "Accès interdit aux ressources protégées." });
+    }
   }
 
   next();
