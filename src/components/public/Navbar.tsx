@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../../context/DataContext';
 import { BrandLogo } from '../common/BrandLogo';
-import { Menu, X, Shield } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { 
@@ -65,7 +65,7 @@ export const Navbar: React.FC = () => {
           ))}
         </nav>
 
-        {/* Controls: Language, Admin */}
+        {/* Controls: Language */}
         <div className="flex items-center gap-2.5">
           
           {/* Language Switcher */}
@@ -75,15 +75,6 @@ export const Navbar: React.FC = () => {
             title="Changer de langue"
           >
             [{activeLanguage.toUpperCase()}]
-          </button>
-
-          {/* Admin Gateway Icon */}
-          <button
-            onClick={() => navigateTo('admin')}
-            title="Espace Administration"
-            className="p-1.5 text-zinc-300 hover:text-red-400 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-500 transition-all cursor-pointer"
-          >
-            <Shield className="w-3.5 h-3.5" />
           </button>
 
           {/* Mobile Menu Button */}

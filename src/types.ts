@@ -40,6 +40,7 @@ export interface PersonalInfo {
   principles?: { title: string; description: string }[];
   heroStats?: HeroStatCard[];
   cvList: CvItem[];
+  translations?: Record<string, any>;
 }
 
 export interface ProjectCategory {
@@ -47,6 +48,7 @@ export interface ProjectCategory {
   name: string;
   slug: string;
   order: number;
+  translations?: Record<string, any>;
 }
 
 export type ProjectStatus = 'published' | 'draft' | 'archived';
@@ -75,11 +77,13 @@ export interface Project {
   results: string[];
   architectureNotes?: string;
   githubUrl?: string;
+  showSourceCode?: boolean;
   liveDemoUrl?: string;
   docUrl?: string;
   publishedAt: string;
   seoTitle?: string;
   seoDescription?: string;
+  translations?: Record<string, any>;
 }
 
 export interface TechCategory {
@@ -116,14 +120,17 @@ export interface Experience {
   contractType: ContractType;
   startDate: string;
   endDate?: string;
+  period?: string;
   isCurrent: boolean;
   description: string;
   responsibilities: string[];
   achievements: string[];
+  highlights?: string[];
   technologyIds: string[];
   companyLogo?: string;
   companyUrl?: string;
   order: number;
+  translations?: Record<string, any>;
 }
 
 export interface Education {
@@ -134,11 +141,13 @@ export interface Education {
   location: string;
   startDate: string;
   endDate?: string;
-  status?: 'graduated' | 'in_progress' | 'completed';
+  period?: string;
+  status?: 'graduated' | 'in_progress' | 'completed' | 'ongoing' | string;
   description?: string;
   logoUrl?: string;
   institutionUrl?: string;
   order: number;
+  translations?: Record<string, any>;
 }
 
 export interface Certification {
@@ -147,6 +156,8 @@ export interface Certification {
   issuer: string;
   issueDate: string;
   expiryDate?: string;
+  expirationDate?: string;
+  badgeImageUrl?: string;
   credentialId?: string;
   credentialUrl?: string;
   certificatePdfUrl?: string;
@@ -154,19 +165,24 @@ export interface Certification {
   description?: string;
   isActive: boolean;
   order: number;
+  translations?: Record<string, any>;
 }
 
 export interface Service {
   id: string;
   title: string;
   description: string;
+  shortDescription?: string;
   icon: string;
   features: string[];
   ctaText?: string;
   ctaUrl?: string;
   isActive: boolean;
   order: number;
+  translations?: Record<string, any>;
 }
+
+export type ServiceOffering = Service;
 
 export type SocialPlatform = 'GitHub' | 'LinkedIn' | 'X' | 'YouTube' | 'GitLab' | 'StackOverflow' | 'Discord' | 'Email' | 'Other';
 
@@ -197,6 +213,7 @@ export interface BlogPost {
   readTimeMinutes: number;
   seoTitle?: string;
   seoDescription?: string;
+  translations?: Record<string, any>;
 }
 
 export interface ContactMessage {
@@ -215,9 +232,11 @@ export interface NavigationItem {
   id: string;
   label: string;
   url: string;
+  href?: string;
   icon?: string;
   order: number;
   isActive: boolean;
+  isVisible?: boolean;
   openInNewTab: boolean;
   sectionId?: string;
 }
@@ -226,7 +245,7 @@ export type SectionKey =
   | 'hero' 
   | 'about' 
   | 'tech_stack' 
-  | 'technologies'
+  | 'technologies' 
   | 'projects' 
   | 'experience' 
   | 'education' 
@@ -288,11 +307,11 @@ export interface SiteSettings {
 export type ThemeMode = 'system' | 'light' | 'dark';
 
 export interface ThemeSettings {
-  mode: ThemeMode;
+  mode?: ThemeMode;
   primaryColor: string;
   secondaryColor: string;
   accentColor: string;
-  borderRadius: 'sm' | 'md' | 'lg' | 'full' | string;
+  borderRadius?: 'sm' | 'md' | 'lg' | 'full' | string;
   fontHeading?: string;
   fontBody?: string;
 }
@@ -367,6 +386,7 @@ export interface AppData {
   education: Education[];
   certifications: Certification[];
   services: Service[];
+  serviceOfferings?: Service[];
   socialLinks: SocialLink[];
   blogPosts: BlogPost[];
   contactMessages: ContactMessage[];
@@ -381,6 +401,8 @@ export interface AppData {
   seoSettings: SeoSettings;
   seoConfig?: SeoConfig;
   users: AdminUser[];
-  adminUsers?: AdminUser[];
   activityLogs: ActivityLog[];
+  securitySettings?: {
+    otpEmail?: string;
+  };
 }

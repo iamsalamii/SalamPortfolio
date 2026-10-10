@@ -1,0 +1,17 @@
+{
+  "name": "Moussa Abdou Salam — .NET Architect Portfolio",
+  "short_name": "Salam.dev",
+  "description": "Portfolio professionnel de Moussa Abdou Salam — Architecte .NET & Développeur Full Stack",
+  "theme_color": "#060709",
+  "background_color": "#060709",
+  "display": "standalone",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/assets/maphotops600.jpg",
+      "type": "image/jpeg",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ]
+}

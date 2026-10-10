@@ -131,21 +131,20 @@ const MainAppContent: React.FC = () => {
     );
   }
 
-  // 3. SINGLE PROJECT DEEP DIVE VIEW
-  if (currentView === 'project-detail' && selectedSlug) {
-    const project = (data.projects || []).find(p => p.slug === selectedSlug);
-    if (project) {
-      return (
-        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#030712] text-slate-900 dark:text-slate-100 transition-colors relative overflow-x-hidden">
-          <Navbar />
-          <main className="flex-1 relative z-10 pt-20">
-            <ProjectDetail project={project} />
-          </main>
-          <Footer />
-          <CvModal />
-        </div>
-      );
-    }
+  // 3. SINGLE PROJECT DEEP DIVE VIEW (PUBLIC ACCESS)
+  if (currentView === 'project-detail') {
+    const project = (data.projects || []).find(p => p.slug === selectedSlug || p.id === selectedSlug);
+    return (
+      <div className="min-h-screen flex flex-col bg-[#060709] text-zinc-100 relative overflow-x-hidden font-mono bg-grid-dark selection:bg-red-600 selection:text-white">
+        <LiquidParticlesBackground />
+        <Navbar />
+        <main className="flex-1 relative z-10 pt-20">
+          <ProjectDetail project={project} />
+        </main>
+        <Footer />
+        <CvModal />
+      </div>
+    );
   }
 
   // 4. MAIN PUBLIC PORTFOLIO (DATA-DRIVEN SECTION SEQUENCE WITH CHAPTER TRANSITIONS)

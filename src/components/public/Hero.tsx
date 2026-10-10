@@ -1,11 +1,17 @@
 import React from 'react';
-import { useData } from '../../context/DataContext';
+import { useData, getLocalizedField } from '../../context/DataContext';
 import { ArrowUpRight, Download, Mail, Github, Linkedin, MapPin, Terminal, Code2, Database, Layers, Sparkles } from 'lucide-react';
 import { HeroStatCard } from '../../types';
 
 export const Hero: React.FC = () => {
   const { data, activeLanguage } = useData();
   const info = data.personalInfo;
+
+  const title = getLocalizedField(info, 'title', activeLanguage) || info?.title || 'FULL STACK .NET 9 & REACT ENGINEER';
+  const headline = getLocalizedField(info, 'headline', activeLanguage) || info?.headline;
+  const bioShort = getLocalizedField(info, 'bioShort', activeLanguage) || info?.bioShort;
+  const availabilityText = getLocalizedField(info, 'availabilityText', activeLanguage) || info?.availabilityText;
+  const location = getLocalizedField(info, 'location', activeLanguage) || info?.location || "ABIDJAN, CÔTE D'IVOIRE";
 
   const defaultStats: HeroStatCard[] = [
     { id: 'stat-1', indexLabel: '01 // EXP', value: '+2 ANS', subtitle: 'DIRECTSOFT INGÉNIERIE', icon: 'terminal' },
@@ -61,11 +67,11 @@ export const Hero: React.FC = () => {
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-2 px-2.5 py-1 bg-red-950/40 border border-red-500/60 text-red-400 font-bold text-[11px] tracking-wider uppercase">
             <span className="w-2 h-2 bg-red-500 rounded-none animate-ping" />
-            {info?.availabilityText || (activeLanguage === 'fr' ? 'DISPONIBLE // MISSIONS & CDI' : 'ACTIVE // OPEN TO OFFERS')}
+            {availabilityText || (activeLanguage === 'fr' ? 'DISPONIBLE // MISSIONS & CDI' : 'ACTIVE // OPEN TO OFFERS')}
           </span>
           <span className="hidden sm:flex items-center gap-1.5 text-zinc-400">
             <MapPin className="w-3.5 h-3.5 text-red-500" />
-            <span>{(info?.location || "ABIDJAN, CÔTE D'IVOIRE").toUpperCase()}</span>
+            <span>{location.toUpperCase()}</span>
           </span>
         </div>
       </div>
@@ -89,10 +95,10 @@ export const Hero: React.FC = () => {
         {/* Sub-headline / Role Statement */}
         <div className="border-l-4 border-red-600 pl-4 sm:pl-6 py-2 my-6">
           <h2 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-zinc-100 tracking-tight uppercase">
-            {info?.title || 'FULL STACK .NET 9 & REACT ENGINEER'}
+            {title}
           </h2>
-          <p className="text-sm sm:text-base text-zinc-400 max-w-3xl leading-relaxed pt-2">
-            {info?.headline || info?.bioShort || (activeLanguage === 'fr' 
+          <p className="text-sm sm:text-base text-zinc-400 max-w-3xl leading-relaxed pt-2 font-normal font-sans">
+            {headline || bioShort || (activeLanguage === 'fr' 
               ? "Développeur au sein du GROUPE DIRECTSOFT (+2 ans). Spécialiste de la conception d'architectures logicielles scalables en C#, ASP.NET Core, EF Core, SQL Server / PostgreSQL et d'interfaces web réactives haute performance."
               : "Software Engineer at GROUPE DIRECTSOFT (+2 yrs). Specialized in architecting scalable, resilient backends with C#, ASP.NET Core, EF Core, SQL Server / PostgreSQL alongside high-octane React frontends.")}
           </p>

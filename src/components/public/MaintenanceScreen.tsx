@@ -2,7 +2,11 @@ import React from 'react';
 import { useData } from '../../context/DataContext';
 import { ShieldAlert, Mail, ShieldCheck } from 'lucide-react';
 
-export const MaintenanceScreen: React.FC = () => {
+interface MaintenanceScreenProps {
+  message?: string;
+}
+
+export const MaintenanceScreen: React.FC<MaintenanceScreenProps> = ({ message }) => {
   const { data, navigateTo } = useData();
 
   return (
