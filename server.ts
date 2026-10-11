@@ -15,7 +15,8 @@ const app = express();
 app.disable("x-powered-by");
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
-const IS_PROD = process.env.NODE_ENV === "production";
+const NODE_ENV = (process.env.NODE_ENV || "production").toLowerCase().trim();
+const IS_PROD = NODE_ENV !== "development" && NODE_ENV !== "test";
 const JWT_SECRET = process.env.JWT_SECRET || "salam_portfolio_secure_jwt_secret_2026_x9k2m";
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "salam@portfolios.com").trim().toLowerCase();
 
@@ -354,7 +355,89 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
   });
 });
 
-// Request / Send OTP code to verified personal email
+// Helpers for Cryptographic 2FA Security
+function generateSecureOtp(): string {
+  return crypto.randomInt(100000, 1000000).toString();
+}
+
+function constantTimeCompare(a: string, b: string): boolean {
+  try {
+    const bufA = Buffer.from(a, "utf8");
+    const bufB = Buffer.from(b, "utf8");
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+  } catch {
+    return false;
+  }
+}
+
+function getSmtpTransporter() {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) return null;
+
+  const cleanPass = pass.replace(/\s+/g, "");
+  const timeoutOptions = {
+    connectionTimeout: 5000,
+    greetingTimeout: 5000,
+    socketTimeout: 5000
+  };
+
+  if (process.env.SMTP_SERVICE === "gmail" || (process.env.SMTP_HOST && process.env.SMTP_HOST.includes("gmail"))) {
+    return nodemailer.createTransport({
+      service: "gmail",
+      ...timeoutOptions,
+      auth: { user, pass: cleanPass }
+    });
+  }
+
+  if (process.env.SMTP_HOST) {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587,
+      secure: process.env.SMTP_SECURE === "true",
+      ...timeoutOptions,
+      auth: { user, pass: cleanPass }
+    });
+  }
+
+  return null;
+}
+
+async function sendOtpEmail(cleanEmail: string, otpCode: string): Promise<boolean> {
+  const transporter = getSmtpTransporter();
+  if (!transporter) return false;
+
+  try {
+    const emailPromise = transporter.sendMail({
+      from: `"SALAM.DEV Security Console" <${process.env.SMTP_FROM || process.env.SMTP_USER || ADMIN_EMAIL}>`,
+      to: cleanEmail,
+      subject: `[SALAM.DEV] Votre Code de Sécurité 2FA`,
+      text: `Bonjour Moussa Abdou Salam,\n\nVotre code d'authentification 2FA à usage unique est : ${otpCode}\n\nCe code est valable pendant 5 minutes.\n\n— Console de Sécurité SALAM.DEV`,
+      html: `<div style="font-family: monospace; background:#060709; color:#f4f4f5; padding:24px; border-radius:12px; border:2px solid #ef4444; max-width:500px;">
+        <h2 style="color:#ef4444; margin-top:0;">// CODE DE SÉCURITÉ 2FA OTP //</h2>
+        <p style="font-size:14px; color:#a1a1aa;">Bonjour <strong>Moussa Abdou Salam</strong>,</p>
+        <p style="font-size:14px; color:#a1a1aa;">Voici votre code de vérification pour accéder à la Console d'Administration :</p>
+        <div style="background:#18181b; border:1px solid #ef4444; padding:16px; text-align:center; font-size:28px; font-weight:bold; letter-spacing:8px; color:#ef4444; margin:18px 0;">
+          ${otpCode}
+        </div>
+        <p style="font-size:12px; color:#71717a;">Ce code expire dans 5 minutes. Ne le partagez avec personne.</p>
+      </div>`
+    });
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Timeout SMTP (5s)")), 5000)
+    );
+
+    await Promise.race([emailPromise, timeoutPromise]);
+    return true;
+  } catch (err) {
+    console.error("[2FA SMTP ERROR] Échec de la transmission SMTP du message.");
+    return false;
+  }
+}
+
+// Request / Send OTP code to verified personal email (Strict: Fail-Closed, Zero-Leak)
 app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
   const { tempToken, destinationEmail } = req.body;
   if (!tempToken || !destinationEmail) {
@@ -374,109 +457,55 @@ app.post("/api/auth/request-otp", async (req: Request, res: Response) => {
   const cleanEmail = String(destinationEmail).trim().toLowerCase();
   const expectedSecurityEmail = (session.personalEmailExpected || process.env.SECURITY_OTP_EMAIL || currentData.securitySettings?.otpEmail || "moussasalam86@gmail.com").trim().toLowerCase();
   
-  // Validate entered personal email against configured security email
+  // Validation stricte : l'utilisateur ne peut pas choisir un destinataire arbitraire
   if (cleanEmail !== expectedSecurityEmail) {
     return res.status(403).json({
       error: "Cette adresse email personnelle ne correspond pas à celle configurée pour la sécurité 2FA."
     });
   }
 
-  // Generate 6-digit cryptographic OTP
-  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  // Échec fermé (Fail-Closed) : si SMTP n'est pas configuré, refus immédiat sans générer de code
+  const transporter = getSmtpTransporter();
+  if (!transporter) {
+    session.otpCode = undefined;
+    console.warn("[2FA SECURITY REJECT] Demande OTP refusée : service SMTP non configuré sur ce serveur.");
+    return res.status(503).json({
+      error: "Le service d'authentification 2FA par email n'est pas opérationnel sur ce serveur. Contactez l'administrateur système pour paramétrer le service SMTP."
+    });
+  }
+
+  // Génération cryptographique du code OTP (6 chiffres aléatoires non prévisibles)
+  const otpCode = generateSecureOtp();
+
+  // Tentative d'expédition par email via SMTP
+  const emailSent = await sendOtpEmail(cleanEmail, otpCode);
+  if (!emailSent) {
+    // Si l'envoi échoue : invalidation immédiate du code, aucun code utilisable
+    session.otpCode = undefined;
+    session.expiresAt = 0;
+    return res.status(502).json({
+      error: "Impossible d'acheminer le code de vérification par email. Veuillez vérifier la connectivité SMTP ou réessayer plus tard."
+    });
+  }
+
+  // Armement de la session OTP uniquement après succès effectif de l'envoi SMTP
   session.otpCode = otpCode;
   session.otpSentTo = cleanEmail;
-  session.expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes validity
+  session.expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes de validité
+  session.attempts = 4;
 
-  // Configure nodemailer transporter
-  let transporter: any = null;
-  let emailDeliverySuccess = false;
-  let emailDeliveryError: string | null = null;
+  // Journalisation sécurisée : JAMAIS de code OTP dans les logs
+  console.log(`[2FA OTP SECURITY DISPATCH] Code expédié avec succès via SMTP à l'adresse de sécurité (${cleanEmail.substring(0, 3)}***@***)`);
+  addActivityLog(session.name, "OTP_DISPATCHED", "Security", "OTP code dispatched to personal address (SMTP: OK)");
 
-  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-    const cleanPass = process.env.SMTP_PASS.replace(/\s+/g, "");
-    const smtpTimeoutOptions = {
-      connectionTimeout: 4000,
-      greetingTimeout: 4000,
-      socketTimeout: 4000
-    };
-
-    if (process.env.SMTP_SERVICE === "gmail" || (process.env.SMTP_HOST && process.env.SMTP_HOST.includes("gmail"))) {
-      transporter = nodemailer.createTransport({
-        service: "gmail",
-        ...smtpTimeoutOptions,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: cleanPass
-        }
-      });
-    } else if (process.env.SMTP_HOST) {
-      transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587,
-        secure: process.env.SMTP_SECURE === "true",
-        ...smtpTimeoutOptions,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: cleanPass
-        }
-      });
-    }
-  }
-
-  // Attempt email transmission (bypassed if x-test-mode header is set to prevent sending real emails during automated tests)
-  const isTestMode = req.headers["x-test-mode"] === "true";
-  if (transporter && !isTestMode) {
-    try {
-      const emailPromise = transporter.sendMail({
-        from: `"SALAM.DEV Security Console" <${process.env.SMTP_FROM || process.env.SMTP_USER || ADMIN_EMAIL}>`,
-        to: cleanEmail,
-        subject: `[SALAM.DEV] Votre Code de Sécurité 2FA : ${otpCode}`,
-        text: `Bonjour Moussa Abdou Salam,\n\nVotre code d'authentification 2FA à usage unique est : ${otpCode}\n\nCe code est valable pendant 5 minutes.\n\n— Console de Sécurité SALAM.DEV`,
-        html: `<div style="font-family: monospace; background:#060709; color:#f4f4f5; padding:24px; border-radius:12px; border:2px solid #ef4444; max-width:500px;">
-          <h2 style="color:#ef4444; margin-top:0;">// CODE DE SÉCURITÉ 2FA OTP //</h2>
-          <p style="font-size:14px; color:#a1a1aa;">Bonjour <strong>Moussa Abdou Salam</strong>,</p>
-          <p style="font-size:14px; color:#a1a1aa;">Voici votre code de vérification pour accéder à la Console d'Administration :</p>
-          <div style="background:#18181b; border:1px solid #ef4444; padding:16px; text-align:center; font-size:28px; font-weight:bold; letter-spacing:8px; color:#ef4444; margin:18px 0;">
-            ${otpCode}
-          </div>
-          <p style="font-size:12px; color:#71717a;">Ce code expire dans 5 minutes. Ne le partagez avec personne.</p>
-        </div>`
-      });
-
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Timeout SMTP (4.5s) - réseau restreint sur le serveur")), 4500)
-      );
-
-      const mailInfo: any = await Promise.race([emailPromise, timeoutPromise]);
-      emailDeliverySuccess = true;
-      console.log(`[SMTP SUCCESS] 2FA OTP Email delivered to ${cleanEmail}. Message ID: ${mailInfo.messageId}`);
-    } catch (mailErr: any) {
-      emailDeliveryError = mailErr?.message || "Erreur SMTP";
-      console.error("[SMTP ERROR] Failed to send email:", mailErr);
-    }
-  }
-
-  // Log securely to terminal (Masked in production to prevent log leaks)
-  if (process.env.NODE_ENV === "production") {
-    console.log(`[2FA OTP SECURITY DISPATCH] Code dispatched to security email: ${cleanEmail.substring(0, 3)}***@*** (SMTP: ${emailDeliverySuccess ? "OK" : "FAILED"})`);
-  } else if (!isTestMode) {
-    console.log(`\n======================================================\n[2FA OTP SECURITY DISPATCH]\nDESTINATION : ${cleanEmail}\nCODE OTP    : ${otpCode}\nVALIDITY    : 5 minutes\nSMTP STATUS : ${emailDeliverySuccess ? "ENVOYÉ AVEC SUCCÈS VIA GMAIL" : transporter ? "ÉCHEC ENVOI (" + emailDeliveryError + ")" : "NON CONFIGURÉ (Mode Local)"}\n======================================================\n`);
-  }
-
-  addActivityLog(session.name, "OTP_DISPATCHED", "Security", `OTP code dispatched to personal address (SMTP: ${emailDeliverySuccess ? "OK" : "LOCAL/ERROR"})`);
-
+  // Réponse HTTP : Zéro fuite de code, pas de devOtpCode, pas d'otpPreview
   return res.json({
     success: true,
-    isSmtpConfigured: emailDeliverySuccess,
-    message: emailDeliverySuccess
-      ? `Code OTP expédié avec succès à votre adresse personnelle (${cleanEmail}). Consultez votre boîte de réception Gmail.`
-      : `Code OTP généré. ${emailDeliveryError ? "Note: " + emailDeliveryError : "Mode de secours actif."}`,
-    devOtpCode: (!emailDeliverySuccess && !isTestMode) ? otpCode : undefined,
-    otpPreview: (!emailDeliverySuccess && !isTestMode) ? otpCode : undefined
+    message: `Code de sécurité expédié avec succès à votre adresse personnelle (${cleanEmail.substring(0, 3)}***@***). Consultez votre boîte de réception Gmail.`
   });
 });
 
-// Verify 2FA OTP Code
+// Verify 2FA OTP Code (Strict: Single-Use, Timing-Safe, Attempts Limit)
 app.post("/api/auth/verify-otp", async (req: Request, res: Response) => {
   const { tempToken, otpCode } = req.body;
   if (!tempToken || !otpCode) {
@@ -494,14 +523,17 @@ app.post("/api/auth/verify-otp", async (req: Request, res: Response) => {
   }
 
   if (!session.otpCode) {
-    return res.status(400).json({ error: "Veuillez d'abord valider votre adresse email pour recevoir le code OTP." });
+    return res.status(400).json({ error: "Aucun code actif pour cette session. Veuillez demander un code." });
   }
 
-  if (session.otpCode !== String(otpCode).trim()) {
+  // Comparaison en temps constant (Timing-Safe)
+  const isMatch = constantTimeCompare(session.otpCode, String(otpCode).trim());
+
+  if (!isMatch) {
     session.attempts -= 1;
     if (session.attempts <= 0) {
       otpSessions.delete(tempToken);
-      return res.status(401).json({ error: "Trop de codes erronés. Session OTP révoquée." });
+      return res.status(401).json({ error: "Trop de codes erronés. Session OTP révoquée.", attemptsLeft: 0 });
     }
     return res.status(401).json({ 
       error: `Code OTP incorrect. ${session.attempts} tentative(s) restante(s).`,
@@ -509,7 +541,7 @@ app.post("/api/auth/verify-otp", async (req: Request, res: Response) => {
     });
   }
 
-  // OTP is valid: cleanup session, reset rate limiter & issue token
+  // Code valide : invalidation immédiate à usage unique (Single-Use)
   otpSessions.delete(tempToken);
   const clientIp = req.ip || req.socket.remoteAddress || "unknown_ip";
   loginRateLimits.delete(clientIp);
@@ -533,7 +565,7 @@ app.post("/api/auth/verify-otp", async (req: Request, res: Response) => {
   });
 });
 
-// Resend OTP Code (Strict: no code leak in response)
+// Resend OTP Code (Strict: Fail-Closed, Zero-Leak)
 app.post("/api/auth/resend-otp", async (req: Request, res: Response) => {
   const { tempToken } = req.body;
   const session = otpSessions.get(tempToken);
@@ -541,18 +573,39 @@ app.post("/api/auth/resend-otp", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Session introuvable. Veuillez vous reconnecter." });
   }
 
-  const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+  if (Date.now() > session.expiresAt + 5 * 60 * 1000) {
+    otpSessions.delete(tempToken);
+    return res.status(401).json({ error: "Session expirée. Veuillez vous reconnecter." });
+  }
+
+  const cleanEmail = session.otpSentTo || session.personalEmailExpected || "moussasalam86@gmail.com";
+  const transporter = getSmtpTransporter();
+  if (!transporter) {
+    session.otpCode = undefined;
+    return res.status(503).json({
+      error: "Le service d'authentification 2FA par email n'est pas opérationnel sur ce serveur."
+    });
+  }
+
+  const newOtp = generateSecureOtp();
+  const emailSent = await sendOtpEmail(cleanEmail, newOtp);
+  if (!emailSent) {
+    session.otpCode = undefined;
+    return res.status(502).json({
+      error: "Impossible d'acheminer le nouveau code par email."
+    });
+  }
+
   session.otpCode = newOtp;
   session.expiresAt = Date.now() + 5 * 60 * 1000;
-  session.attempts = 3;
+  session.attempts = 4;
 
-  // Log securely to terminal
-  console.log(`[2FA OTP RESEND] New code generated for ${session.personalEmailExpected || session.adminEmail}`);
+  console.log(`[2FA OTP RESEND] Nouveau code expédié via SMTP à l'email de sécurité (${cleanEmail.substring(0, 3)}***@***)`);
 
   return res.json({
     success: true,
     expiresInSeconds: 300,
-    message: "Nouveau code OTP généré et expédié à votre adresse personnelle."
+    message: "Nouveau code de sécurité expédié avec succès à votre adresse personnelle."
   });
 });
 

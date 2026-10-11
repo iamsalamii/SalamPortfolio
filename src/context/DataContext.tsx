@@ -33,9 +33,6 @@ interface DataContextType {
   requestOtp: (tempToken: string, destinationEmail: string) => Promise<{
     success: boolean;
     message?: string;
-    otpPreview?: string;
-    isSmtpConfigured?: boolean;
-    devOtpCode?: string;
     error?: string;
   }>;
   verifyOtp: (tempToken: string, otpCode: string) => Promise<{
@@ -45,7 +42,7 @@ interface DataContextType {
   }>;
   resendOtp: (tempToken: string) => Promise<{
     success: boolean;
-    otpPreview?: string;
+    message?: string;
     error?: string;
   }>;
   resetRateLimit: () => Promise<void>;
@@ -576,20 +573,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (res.ok) {
         return {
           success: true,
-          message: resData.message,
-          isSmtpConfigured: resData.isSmtpConfigured,
-          devOtpCode: resData.devOtpCode
+          message: resData.message
         };
       }
 
       return {
         success: false,
-        error: resData.error || 'Impossible de transmettre le code OTP.'
+        error: resData.error || 'Impossible de transmettre le code de sécurité.'
       };
     } catch {
       return {
         success: false,
-        error: 'Erreur réseau lors de la demande du code OTP.'
+        error: 'Erreur réseau lors de la demande du code de sécurité.'
       };
     }
   };
@@ -630,7 +625,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       const resData = await res.json();
       if (res.ok) {
-        return { success: true, otpPreview: resData.otpPreview };
+        return { success: true, message: resData.message };
       }
       return { success: false, error: resData.error || 'Impossible de renvoyer le code.' };
     } catch {

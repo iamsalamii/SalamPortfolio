@@ -17,8 +17,6 @@ export const AdminLogin: React.FC = () => {
   const [destinationEmail, setDestinationEmail] = useState('');
   const [otpDispatched, setOtpDispatched] = useState(false);
   const [otpCode, setOtpCode] = useState('');
-  const [isSmtpConfigured, setIsSmtpConfigured] = useState(true);
-  const [devOtpCode, setDevOtpCode] = useState<string | null>(null);
   
   // Status & Feedback state
   const [error, setError] = useState('');
@@ -83,9 +81,8 @@ export const AdminLogin: React.FC = () => {
         setDestinationEmail(''); // Starts completely empty as requested
         setOtpDispatched(false);
         setOtpCode('');
-        setDevOtpCode(null);
         setStep('otp');
-        setInfoMsg(res.message || 'Identifiants acceptés. Veuillez renseigner votre email personnel configuré pour recevoir le code OTP.');
+        setInfoMsg(res.message || 'Identifiants acceptés. Veuillez renseigner votre email personnel configuré pour recevoir le code de sécurité.');
         return;
       }
 
@@ -111,11 +108,9 @@ export const AdminLogin: React.FC = () => {
       const res = await requestOtp(tempToken, destinationEmail.trim());
       if (res.success) {
         setOtpDispatched(true);
-        setIsSmtpConfigured(!!res.isSmtpConfigured);
-        setDevOtpCode(res.devOtpCode || null);
-        setInfoMsg(res.message || `Code OTP transmis avec succès à ${destinationEmail.trim()}.`);
+        setInfoMsg(res.message || `Code de sécurité transmis avec succès à votre adresse.`);
       } else {
-        setError(res.error || 'Impossible de transmettre le code OTP.');
+        setError(res.error || 'Impossible de transmettre le code de sécurité.');
       }
     } catch {
       setError('Erreur lors de la vérification de l’email personnel.');
@@ -344,27 +339,12 @@ export const AdminLogin: React.FC = () => {
                     onClick={() => {
                       setOtpDispatched(false);
                       setOtpCode('');
-                      setDevOtpCode(null);
                     }}
                     className="text-red-400 hover:text-red-300 text-[10px] uppercase font-bold underline cursor-pointer shrink-0 ml-2"
                   >
                     [ CHANGER ]
                   </button>
                 </div>
-
-                {!isSmtpConfigured && devOtpCode && (
-                  <div className="p-3.5 bg-amber-950/30 border border-amber-500/40 text-xs space-y-1.5 text-amber-200">
-                    <span className="text-[10px] font-bold uppercase text-amber-400 block tracking-wider">
-                      // MODE LOCAL DEV (SMTP NON CONFIGURÉ DANS .ENV) //
-                    </span>
-                    <p className="text-[11px] text-zinc-300 leading-relaxed">
-                      Le serveur s'exécute en local sans compte SMTP. Votre code de sécurité 2FA généré est : <strong className="text-amber-400 font-mono text-sm tracking-widest bg-zinc-950 px-2 py-0.5 border border-amber-500/50 inline-block ml-1">{devOtpCode}</strong>
-                    </p>
-                    <p className="text-[10px] text-zinc-500">
-                      (Pour recevoir vos codes directement sur votre boîte Gmail, configurez SMTP_USER et SMTP_PASS dans le fichier .env)
-                    </p>
-                  </div>
-                )}
 
                 <div className="space-y-1">
                   <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400">

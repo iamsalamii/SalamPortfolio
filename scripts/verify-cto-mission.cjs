@@ -231,10 +231,14 @@ async function runAudit() {
     `Rate Limiting actif : Décompte des tentatives restantes (${invalidLoginRes.data?.attemptsLeft})`);
 
   // G. Non-exposition des secrets & masquage
-  assert(serverCode.includes('process.env.NODE_ENV === "production"'),
-    'server.ts : Masquage en production activé pour les adresses et logs');
-  assert(serverCode.includes('devOtpCode: (!isProduction && !emailDeliverySuccess && !isTestMode) ? otpCode : undefined'),
-    'server.ts : devOtpCode sanitizé et jamais exposé en production ou mode test');
+  assert(!serverCode.includes('devOtpCode'),
+    'server.ts : devOtpCode totalement supprimé de l\'API (zéro fuite de code OTP)');
+  assert(!serverCode.includes('otpPreview'),
+    'server.ts : otpPreview totalement supprimé de l\'API (zéro fuite de code OTP)');
+  assert(serverCode.includes('generateSecureOtp'),
+    'server.ts : Génération cryptographique aléatoire de l\'OTP active');
+  assert(serverCode.includes('constantTimeCompare'),
+    'server.ts : Comparaison en temps constant (Timing-Safe) active');
 
   // ------------------------------------------------------------------
   // SECTION 3 : DÉPLOIEMENT ET RESTAURATION DES DONNÉES DE TEST
