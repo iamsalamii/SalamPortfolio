@@ -371,68 +371,96 @@ function constantTimeCompare(a: string, b: string): boolean {
   }
 }
 
+function createTransporterConfig(port: number, secure: boolean) {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) return null;
+  const cleanPass = pass.replace(/\s+/g, "").replace(/['"]/g, "");
+  const cleanUser = user.trim().replace(/['"]/g, "");
+  const host = (process.env.SMTP_HOST || "smtp.gmail.com").trim().replace(/['"]/g, "");
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    family: 4, // Force IPv4 pour contourner les latences de routage IPv6 sous Docker Alpine
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 8000,
+    auth: { user: cleanUser, pass: cleanPass }
+  } as any);
+}
+
 function getSmtpTransporter() {
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
   if (!user || !pass) return null;
 
-  const cleanPass = pass.replace(/\s+/g, "");
-  const timeoutOptions = {
-    connectionTimeout: 5000,
-    greetingTimeout: 5000,
-    socketTimeout: 5000
-  };
-
-  if (process.env.SMTP_SERVICE === "gmail" || (process.env.SMTP_HOST && process.env.SMTP_HOST.includes("gmail"))) {
-    return nodemailer.createTransport({
-      service: "gmail",
-      ...timeoutOptions,
-      auth: { user, pass: cleanPass }
-    });
-  }
-
-  if (process.env.SMTP_HOST) {
-    return nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587,
-      secure: process.env.SMTP_SECURE === "true",
-      ...timeoutOptions,
-      auth: { user, pass: cleanPass }
-    });
-  }
-
-  return null;
+  const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 465;
+  const secure = process.env.SMTP_SECURE === "true" || port === 465;
+  return createTransporterConfig(port, secure);
 }
 
 async function sendOtpEmail(cleanEmail: string, otpCode: string): Promise<boolean> {
-  const transporter = getSmtpTransporter();
-  if (!transporter) return false;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) return false;
 
+  const senderEmail = (process.env.SMTP_FROM || user || ADMIN_EMAIL).trim().replace(/['"]/g, "");
+
+  const mailOptions = {
+    from: `"SALAM.DEV Security Console" <${senderEmail}>`,
+    to: cleanEmail,
+    subject: `[SALAM.DEV] Votre Code de Sécurité 2FA : ${otpCode}`,
+    text: `Bonjour Moussa Abdou Salam,\n\nVotre code d'authentification 2FA à usage unique est : ${otpCode}\n\nCe code est valable pendant 5 minutes.\n\n— Console de Sécurité SALAM.DEV`,
+    html: `<div style="font-family: monospace; background:#060709; color:#f4f4f5; padding:24px; border-radius:12px; border:2px solid #ef4444; max-width:500px;">
+      <h2 style="color:#ef4444; margin-top:0;">// CODE DE SÉCURITÉ 2FA OTP //</h2>
+      <p style="font-size:14px; color:#a1a1aa;">Bonjour <strong>Moussa Abdou Salam</strong>,</p>
+      <p style="font-size:14px; color:#a1a1aa;">Voici votre code de vérification pour accéder à la Console d'Administration :</p>
+      <div style="background:#18181b; border:1px solid #ef4444; padding:16px; text-align:center; font-size:28px; font-weight:bold; letter-spacing:8px; color:#ef4444; margin:18px 0;">
+        ${otpCode}
+      </div>
+      <p style="font-size:12px; color:#71717a;">Ce code expire dans 5 minutes. Ne le partagez avec personne.</p>
+    </div>`
+  };
+
+  const primaryPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 465;
+  const primarySecure = process.env.SMTP_SECURE === "true" || primaryPort === 465;
+
+  // Tentative 1 : Port principal (par défaut 465 SSL direct ou selon SMTP_PORT)
   try {
-    const emailPromise = transporter.sendMail({
-      from: `"SALAM.DEV Security Console" <${process.env.SMTP_FROM || process.env.SMTP_USER || ADMIN_EMAIL}>`,
-      to: cleanEmail,
-      subject: `[SALAM.DEV] Votre Code de Sécurité 2FA`,
-      text: `Bonjour Moussa Abdou Salam,\n\nVotre code d'authentification 2FA à usage unique est : ${otpCode}\n\nCe code est valable pendant 5 minutes.\n\n— Console de Sécurité SALAM.DEV`,
-      html: `<div style="font-family: monospace; background:#060709; color:#f4f4f5; padding:24px; border-radius:12px; border:2px solid #ef4444; max-width:500px;">
-        <h2 style="color:#ef4444; margin-top:0;">// CODE DE SÉCURITÉ 2FA OTP //</h2>
-        <p style="font-size:14px; color:#a1a1aa;">Bonjour <strong>Moussa Abdou Salam</strong>,</p>
-        <p style="font-size:14px; color:#a1a1aa;">Voici votre code de vérification pour accéder à la Console d'Administration :</p>
-        <div style="background:#18181b; border:1px solid #ef4444; padding:16px; text-align:center; font-size:28px; font-weight:bold; letter-spacing:8px; color:#ef4444; margin:18px 0;">
-          ${otpCode}
-        </div>
-        <p style="font-size:12px; color:#71717a;">Ce code expire dans 5 minutes. Ne le partagez avec personne.</p>
-      </div>`
-    });
+    const transporter = createTransporterConfig(primaryPort, primarySecure);
+    if (!transporter) return false;
 
+    const emailPromise = transporter.sendMail(mailOptions);
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Timeout SMTP (5s)")), 5000)
+      setTimeout(() => reject(new Error(`Délai SMTP dépassé sur port ${primaryPort} (8s)`)), 8000)
     );
 
     await Promise.race([emailPromise, timeoutPromise]);
+    console.log(`[2FA SMTP SUCCESS] Email délivré avec succès via le port ${primaryPort}.`);
     return true;
-  } catch (err) {
-    console.error("[2FA SMTP ERROR] Échec de la transmission SMTP du message.");
+  } catch (err: any) {
+    console.warn(`[2FA SMTP WARNING] Échec sur le port ${primaryPort} (${err?.message || err?.code}). Tentative sur le port alternatif...`);
+  }
+
+  // Tentative 2 : Port alternatif de secours (bascule automatique 465 <-> 587)
+  try {
+    const altPort = primaryPort === 465 ? 587 : 465;
+    const altSecure = altPort === 465;
+    const altTransporter = createTransporterConfig(altPort, altSecure);
+    if (!altTransporter) return false;
+
+    const emailPromise = altTransporter.sendMail(mailOptions);
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`Délai SMTP alternatif dépassé sur port ${altPort} (8s)`)), 8000)
+    );
+
+    await Promise.race([emailPromise, timeoutPromise]);
+    console.log(`[2FA SMTP SUCCESS] Email délivré avec succès via le port alternatif ${altPort}.`);
+    return true;
+  } catch (altErr: any) {
+    console.error("[2FA SMTP ERROR] Échec de transmission SMTP sur tous les ports testés:", altErr?.message || altErr?.code);
     return false;
   }
 }
